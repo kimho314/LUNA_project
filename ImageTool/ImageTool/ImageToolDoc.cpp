@@ -54,6 +54,7 @@ BEGIN_MESSAGE_MAP(CImageToolDoc, CDocument)
 	ON_COMMAND(ID_SPATIALFILTERING, &CImageToolDoc::OnSpatialfiltering)
 	ON_COMMAND(ID_RGB_TO_HSI, &CImageToolDoc::OnRgbToHsi)
 	ON_COMMAND(ID_COLOR_COMPLEMENT, &CImageToolDoc::OnColorComplement)
+	ON_COMMAND(ID_COLOR_SLICING, &CImageToolDoc::OnColorSlicing)
 END_MESSAGE_MAP()
 
 
@@ -1943,6 +1944,159 @@ void CImageToolDoc::OnColorComplement()
 		//HSItoRGB(&dst_dib, &hue_complement, &sat_complement, &int_complement);
 		HSItoRGB(&dst_dib, &hue_dib, &sat_dib, &int_dib);
 		AfxNewImage(dst_dib);
+	}
+	else
+	{
+		AfxMessageBox((LPCTSTR)"It's not supported");
+	}
+}
+
+
+void CImageToolDoc::OnColorSlicing()
+{
+	// TODO: Add your command handler code here
+	int src_w = m_Dib.GetWidth();
+	int src_h = m_Dib.GetHeight();
+
+	if (m_Dib.GetBitCount() == 24)
+	{
+		CDib src_dib = m_Dib;
+		RGBBYTE** src_ptr = src_dib.GetRGBPtr();
+		CDib dst_dib1; // cube-based color slicing
+		dst_dib1.CreateRGBImage(src_w, src_h);
+		RGBBYTE** dst_ptr1 = dst_dib1.GetRGBPtr();
+		CDib dst_dib2; // sphere-based color slicing
+		dst_dib2.CreateRGBImage(src_w, src_h);
+		RGBBYTE** dst_ptr2 = dst_dib2.GetRGBPtr();
+
+		const double w = 0.2549;
+		const double r0 = 0.1765;
+
+		// cube-based color sliving
+		double **r_tmp1 = nullptr;
+		r_tmp1 = new double*[src_h];
+		double **g_tmp1 = nullptr;
+		g_tmp1 = new double*[src_h];
+		double **b_tmp1 = nullptr;
+		b_tmp1 = new double*[src_h];
+		for (int i = 0; i < src_h; i++)
+		{
+			r_tmp1[i] = new double[src_w];
+			g_tmp1[i] = new double[src_w];
+			b_tmp1[i] = new double[src_w];
+		}
+
+		for (int j = 0; j < src_h; j++)
+		{
+			for (int i = 0; i < src_w; i++)
+			{
+				r_tmp1[j][i] = src_ptr[j][i].r / 255.0f;
+				g_tmp1[j][i] = src_ptr[j][i].g / 255.0f;
+				b_tmp1[j][i] = src_ptr[j][i].b / 255.0f;
+			}
+		}
+
+		for (int j = 0; j < src_h; j++)
+		{
+			double dist1 = 0.0;
+			double dist2 = 0.0;
+			double dist3 = 0.0;
+
+			for (int i = 0; i < src_w; i++)
+			{
+				dist1 = abs(r_tmp1[j][i] - 0.6863);
+				dist2 = abs(g_tmp1[j][i] - 0.1608);
+				dist3 = abs(b_tmp1[j][i] - 0.1922);
+
+				if ((dist1 > (w / 2)) || (dist2 > (w / 2)) || (dist3 > (w / 2)))
+				{
+					r_tmp1[j][i] = 0.5;
+					g_tmp1[j][i] = 0.5;
+					b_tmp1[j][i] = 0.5;
+				}
+				
+
+				dst_ptr1[j][i].r = (int)round(r_tmp1[j][i] * 255.0);
+				dst_ptr1[j][i].g = (int)round(g_tmp1[j][i] * 255.0);
+				dst_ptr1[j][i].b = (int)round(b_tmp1[j][i] * 255.0);
+			}
+		}
+		
+		AfxNewImage(dst_dib1);
+
+		for (int i = 0; i < src_h; i++)
+		{
+			delete(r_tmp1[i]);
+			delete(g_tmp1[i]);
+			delete(b_tmp1[i]);
+		}
+		delete(r_tmp1);
+		delete(g_tmp1);
+		delete(b_tmp1);
+
+		// sphere-based color slicing
+		double **r_tmp2 = nullptr;
+		r_tmp2 = new double*[src_h];
+		double **g_tmp2 = nullptr;
+		g_tmp2 = new double*[src_h];
+		double **b_tmp2 = nullptr;
+		b_tmp2 = new double*[src_h];
+		for (int i = 0; i < src_h; i++)
+		{
+			r_tmp2[i] = new double[src_w];
+			g_tmp2[i] = new double[src_w];
+			b_tmp2[i] = new double[src_w];
+		}
+
+		for (int j = 0; j < src_h; j++)
+		{
+			for (int i = 0; i < src_w; i++)
+			{
+				r_tmp2[j][i] = src_ptr[j][i].r / 255.0f;
+				g_tmp2[j][i] = src_ptr[j][i].g / 255.0f;
+				b_tmp2[j][i] = src_ptr[j][i].b / 255.0f;
+			}
+		}
+
+		for (int j = 0; j < src_h; j++)
+		{
+			double dist1 = 0.0;
+			double dist2 = 0.0;
+			double dist3 = 0.0;
+			double sum_dist = 0.0;
+
+			for (int i = 0; i < src_w; i++)
+			{
+				dist1 = pow((r_tmp2[j][i] - 0.6863), 2);
+				dist2 = pow((g_tmp2[j][i] - 0.1608), 2);
+				dist3 = pow((b_tmp2[j][i] - 0.1922), 2);
+				sum_dist = dist1 + dist2 + dist3;
+
+				if (sum_dist > pow(r0, 2))
+				{
+					r_tmp2[j][i] = 0.5;
+					g_tmp2[j][i] = 0.5;
+					b_tmp2[j][i] = 0.5;
+				}
+
+				dst_ptr2[j][i].r = (int)round(r_tmp2[j][i] * 255.0);
+				dst_ptr2[j][i].g = (int)round(g_tmp2[j][i] * 255.0);
+				dst_ptr2[j][i].b = (int)round(b_tmp2[j][i] * 255.0);
+			}
+		}
+				
+
+		AfxNewImage(dst_dib2);
+
+		for (int i = 0; i < src_h; i++)
+		{
+			delete(r_tmp2[i]);
+			delete(g_tmp2[i]);
+			delete(b_tmp2[i]);
+		}
+		delete(r_tmp2);
+		delete(g_tmp2);
+		delete(b_tmp2);
 	}
 	else
 	{

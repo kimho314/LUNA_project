@@ -138,13 +138,14 @@
 #define ID_                             32812
 #define ID_RGB_TO_HSI                   32813
 #define ID_COLOR_COMPLEMENT             32814
+#define ID_COLOR_SLICING                32815
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        325
-#define _APS_NEXT_COMMAND_VALUE         32815
+#define _APS_NEXT_COMMAND_VALUE         32816
 #define _APS_NEXT_CONTROL_VALUE         1006
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
