@@ -1647,6 +1647,140 @@ void GetIntComponent(CDib *dst, CDib *src)
 	delete(tmp_b);
 }
 
+void RGBtoHSI(CDib *hue, CDib *sat, CDib *inten, CDib *src)
+{
+	int src_w = src->GetWidth();
+	int src_h = src->GetHeight();
+
+	RGBBYTE** src_ptr = src->GetRGBPtr();
+	BYTE** hue_ptr = hue->GetPtr();
+	BYTE** sat_ptr = sat->GetPtr();
+	BYTE** int_ptr = inten->GetPtr();
+
+	double **tmp_r = nullptr;
+	tmp_r = new double*[src_h];
+	for (int i = 0; i < src_h; i++)
+		tmp_r[i] = new double[src_w];
+
+	double **tmp_g = nullptr;
+	tmp_g = new double*[src_h];
+	for (int i = 0; i < src_h; i++)
+		tmp_g[i] = new double[src_w];
+
+	double **tmp_b = nullptr;
+	tmp_b = new double*[src_h];
+	for (int i = 0; i < src_h; i++)
+		tmp_b[i] = new double[src_w];
+
+	double **tmp_hue = nullptr;
+	tmp_hue = new double*[src_h];
+	for (int i = 0; i < src_h; i++)
+		tmp_hue[i] = new double[src_w];
+
+	double **tmp_sat = nullptr;
+	tmp_sat = new double*[src_h];
+	for (int i = 0; i < src_h; i++)
+		tmp_sat[i] = new double[src_w];
+
+	double **tmp_int = nullptr;
+	tmp_int = new double*[src_h];
+	for (int i = 0; i < src_h; i++)
+		tmp_int[i] = new double[src_w];
+
+
+	for (int j = 0; j < src_h; j++)
+	{
+		for (int i = 0; i < src_w; i++)
+		{
+			tmp_r[j][i] = (double)src_ptr[j][i].r / 255.0;
+			tmp_g[j][i] = (double)src_ptr[j][i].g / 255.0;
+			tmp_b[j][i] = (double)src_ptr[j][i].b / 255.0;
+		}
+	}
+
+	double epsillon = 0.000001;
+
+	for (int j = 0; j < src_h; j++)
+	{
+		double theta = 0.0;
+		double numer = 0.0;
+		double denomi = 0.0;
+		double min_val = 0.0;
+
+		for (int i = 0; i < src_w; i++)
+		{
+			numer = ((tmp_r[j][i] - tmp_g[j][i]) + (tmp_r[j][i] - tmp_b[j][i])) / 2.0;
+			denomi = sqrt(pow((tmp_r[j][i] - tmp_g[j][i]), 2) + ((tmp_r[j][i] - tmp_b[j][i]) * (tmp_g[j][i] - tmp_b[j][i])));
+			theta = acos(numer / (denomi + epsillon));
+
+			if (tmp_b[j][i] <= tmp_g[j][i])
+			{
+				tmp_hue[j][i] = theta;
+			}
+			else
+			{
+				tmp_hue[j][i] = 2 * PI - theta;
+			}
+
+
+			tmp_hue[j][i] = ((tmp_hue[j][i] * 180.0 / PI) / 360.0) * 255.0; // [0,255]
+			if (tmp_hue[j][i] < 0.0)
+				tmp_hue[j][i] = 0.0;
+			if (tmp_hue[j][i] > 255.0)
+				tmp_hue[j][i] = 255.0;
+			hue_ptr[j][i] = (int)round(tmp_hue[j][i]);
+
+			min_val = tmp_r[j][i];
+			min_val = (min_val > tmp_g[j][i]) ? tmp_g[j][i] : min_val;
+			min_val = (min_val > tmp_b[j][i]) ? tmp_b[j][i] : min_val;
+
+			tmp_sat[j][i] = 1.0 - ((3.0 / (tmp_r[j][i] + tmp_g[j][i] + tmp_b[j][i])) * min_val);
+			tmp_sat[j][i] *= 255.0;
+			if (tmp_sat[j][i] < 0.0)
+				tmp_sat[j][i] = 0.0;
+			if (tmp_sat[j][i] > 255.0)
+				tmp_sat[j][i] = 255.0;
+			sat_ptr[j][i] = (int)round(tmp_sat[j][i]);
+
+			tmp_int[j][i] = (tmp_r[j][i] + tmp_g[j][i] + tmp_b[j][i]) / 3.0;
+			tmp_int[j][i] *= 255.0;
+			if (tmp_int[j][i] < 0.0)
+				tmp_int[j][i] = 0.0;
+			if (tmp_int[j][i] > 255.0)
+				tmp_int[j][i] = 255.0;
+			int_ptr[j][i] = (int)round(tmp_int[j][i]);
+
+			
+		}
+	}
+	
+
+	for (int i = 0; i < src_h; i++)
+		delete(tmp_hue[i]);
+	delete(tmp_hue);
+
+	for (int i = 0; i < src_h; i++)
+		delete(tmp_sat[i]);
+	delete(tmp_sat);
+
+	for (int i = 0; i < src_h; i++)
+		delete(tmp_int[i]);
+	delete(tmp_int);
+	
+	
+	for (int i = 0; i < src_h; i++)
+		delete(tmp_r[i]);
+	delete(tmp_r);
+
+	for (int i = 0; i < src_h; i++)
+		delete(tmp_g[i]);
+	delete(tmp_g);
+
+	for (int i = 0; i < src_h; i++)
+		delete(tmp_b[i]);
+	delete(tmp_b);
+}
+
 void CImageToolDoc::OnRgbToHsi()
 {
 	// TODO: Add your command handler code here	
@@ -1684,12 +1818,13 @@ void CImageToolDoc::OnRgbToHsi()
 		sat_dib.CreateGrayImage(w, h);
 		int_dib.CreateGrayImage(w, h);
 		
+		RGBtoHSI(&hue_dib, &sat_dib, &int_dib, &src_dib);
 
-		GetHueComponent(&hue_dib, &src_dib);
+		//GetHueComponent(&hue_dib, &src_dib);
 		AfxNewImage(hue_dib);
-		GetSatComponent(&sat_dib, &src_dib);
+		//GetSatComponent(&sat_dib, &src_dib);
 		AfxNewImage(sat_dib);
-		GetIntComponent(&int_dib, &src_dib);
+		//GetIntComponent(&int_dib, &src_dib);
 		AfxNewImage(int_dib);	
 
 	}
@@ -1735,7 +1870,7 @@ void HueComplement(CDib *dst, CDib *src)
 	{
 		for (int i = 0; i < src_w; i++)
 		{
-			tmp_hue[j][i] = src_ptr[j][i] / 255.0;
+			tmp_hue[j][i] = (double)src_ptr[j][i] / 255.0;
 		}
 	}
 
@@ -1747,8 +1882,12 @@ void HueComplement(CDib *dst, CDib *src)
 			if (tmp_hue[j][i] > 1)
 				tmp_hue[j][i] -= 1.0;
 						
-
-			dst_ptr[j][i] = (int)round(tmp_hue[j][i] * 255.0);
+			tmp_hue[j][i] *= 255.0;
+			if (tmp_hue[j][i] > 255.0)
+				tmp_hue[j][i] = 255.0;
+			if (tmp_hue[j][i] < 0.0)
+				tmp_hue[j][i] = 0.0;
+			dst_ptr[j][i] = (int)round(tmp_hue[j][i]);
 		}
 	}
 
@@ -1833,7 +1972,7 @@ void HSItoRGB(CDib *dst, CDib *hue, CDib *sat, CDib *intensity)
 	{
 		for (int i = 0; i < dst_w; i++)
 		{
-			hue_tmp[j][i] = ((hue_ptr[j][i] / 255.0) * 360.0) * PI / 180.0; // [0,1] -> [0,360], degree -> radian
+			hue_tmp[j][i] = (((double)hue_ptr[j][i] / 255.0) * 360.0) * PI / 180.0; // [0,1] -> [0,360], degree -> radian [0,2*PI]
 			sat_tmp[j][i] = sat_ptr[j][i] / 255.0;
 			int_tmp[j][i] = int_ptr[j][i] / 255.0;			
 			tmp_r[j][i] = 0.0;
@@ -1879,14 +2018,15 @@ void HSItoRGB(CDib *dst, CDib *hue, CDib *sat, CDib *intensity)
 				tmp_g[j][i] = x;
 				tmp_b[j][i] = y;
 				tmp_r[j][i] = z;
-			}
+			}			
 		}
 	}
+		
 
 	for (int j = 0; j < dst_h; j++)
 	{
 		for (int i = 0; i < dst_w; i++)
-		{			
+		{		
 			tmp_r[j][i] *= 255.0;
 			tmp_g[j][i] *= 255.0;
 			tmp_b[j][i] *= 255.0;
@@ -1953,9 +2093,10 @@ void CImageToolDoc::OnColorComplement()
 		sat_dib.CreateGrayImage(w, h);
 		int_dib.CreateGrayImage(w, h);
 
-		GetHueComponent(&hue_dib, &src_dib);		
-		GetSatComponent(&sat_dib, &src_dib);		
-		GetIntComponent(&int_dib, &src_dib);
+		//GetHueComponent(&hue_dib, &src_dib);		
+		//GetSatComponent(&sat_dib, &src_dib);		
+		//GetIntComponent(&int_dib, &src_dib);
+		RGBtoHSI(&hue_dib, &sat_dib, &int_dib, &src_dib);
 		
 		CDib hue_complement;
 		CDib sat_complement;
