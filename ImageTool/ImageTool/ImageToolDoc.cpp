@@ -1726,7 +1726,36 @@ void HueComplement(CDib *dst, CDib *src)
 	BYTE **src_ptr = src->GetPtr();
 	BYTE **dst_ptr = dst->GetPtr();
 
+	double **tmp_hue = nullptr;
+	tmp_hue = new double*[src_h];
+	for (int i = 0; i < src_h; i++)
+		tmp_hue[i] = new double[src_w];
 
+	for (int j = 0; j < src_h; j++)
+	{
+		for (int i = 0; i < src_w; i++)
+		{
+			tmp_hue[j][i] = src_ptr[j][i] / 255.0;
+		}
+	}
+
+	for (int j = 0; j < src_h; j++)
+	{
+		for (int i = 0; i < src_w; i++)
+		{
+			tmp_hue[j][i] += 0.5;
+			if (tmp_hue[j][i] > 1)
+				tmp_hue[j][i] -= 1.0;
+						
+
+			dst_ptr[j][i] = (int)round(tmp_hue[j][i] * 255.0);
+		}
+	}
+
+	
+	for (int i = 0; i < src_h; i++)
+		delete(tmp_hue[i]);
+	delete(tmp_hue);
 }
 
 void SatComplement(CDib *dst, CDib *src)
@@ -1804,7 +1833,7 @@ void HSItoRGB(CDib *dst, CDib *hue, CDib *sat, CDib *intensity)
 	{
 		for (int i = 0; i < dst_w; i++)
 		{
-			hue_tmp[j][i] = ((hue_ptr[j][i] / 255.0) * 360.0) * PI / 180.0;
+			hue_tmp[j][i] = ((hue_ptr[j][i] / 255.0) * 360.0) * PI / 180.0; // [0,1] -> [0,360], degree -> radian
 			sat_tmp[j][i] = sat_ptr[j][i] / 255.0;
 			int_tmp[j][i] = int_ptr[j][i] / 255.0;			
 			tmp_r[j][i] = 0.0;
@@ -1941,8 +1970,7 @@ void CImageToolDoc::OnColorComplement()
 
 		CDib dst_dib;
 		dst_dib.CreateRGBImage(w, h);
-		//HSItoRGB(&dst_dib, &hue_complement, &sat_complement, &int_complement);
-		HSItoRGB(&dst_dib, &hue_dib, &sat_dib, &int_dib);
+		HSItoRGB(&dst_dib, &hue_complement, &sat_complement, &int_complement);		
 		AfxNewImage(dst_dib);
 	}
 	else
