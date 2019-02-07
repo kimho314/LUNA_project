@@ -1711,7 +1711,7 @@ void RGBtoHSI(CDib *hue, CDib *sat, CDib *inten, CDib *src)
 		{
 			numer = ((tmp_r[j][i] - tmp_g[j][i]) + (tmp_r[j][i] - tmp_b[j][i])) / 2.0;
 			denomi = sqrt(pow((tmp_r[j][i] - tmp_g[j][i]), 2) + ((tmp_r[j][i] - tmp_b[j][i]) * (tmp_g[j][i] - tmp_b[j][i])));
-			theta = acos(numer / (denomi + epsillon));
+			theta = acos(numer / (denomi/* + epsillon*/));
 
 			if (tmp_b[j][i] <= tmp_g[j][i])
 			{
@@ -1722,12 +1722,12 @@ void RGBtoHSI(CDib *hue, CDib *sat, CDib *inten, CDib *src)
 				tmp_hue[j][i] = 2 * PI - theta;
 			}
 
-
-			tmp_hue[j][i] = ((tmp_hue[j][i] * 180.0 / PI) / 360.0) * 255.0; // [0,255]
 			if (tmp_hue[j][i] < 0.0)
 				tmp_hue[j][i] = 0.0;
-			if (tmp_hue[j][i] > 255.0)
-				tmp_hue[j][i] = 255.0;
+			if (tmp_hue[j][i] > 2 * PI)
+				tmp_hue[j][i] = 2 * PI;
+
+			tmp_hue[j][i] = ((tmp_hue[j][i] * 180.0 / PI) / 360.0) * 255.0; // [0,255]			
 			hue_ptr[j][i] = (int)round(tmp_hue[j][i]);
 
 			min_val = tmp_r[j][i];
@@ -1820,11 +1820,9 @@ void CImageToolDoc::OnRgbToHsi()
 		
 		RGBtoHSI(&hue_dib, &sat_dib, &int_dib, &src_dib);
 
-		//GetHueComponent(&hue_dib, &src_dib);
-		AfxNewImage(hue_dib);
-		//GetSatComponent(&sat_dib, &src_dib);
-		AfxNewImage(sat_dib);
-		//GetIntComponent(&int_dib, &src_dib);
+		
+		AfxNewImage(hue_dib);		
+		AfxNewImage(sat_dib);		
 		AfxNewImage(int_dib);	
 
 	}
@@ -2019,6 +2017,19 @@ void HSItoRGB(CDib *dst, CDib *hue, CDib *sat, CDib *intensity)
 				tmp_b[j][i] = y;
 				tmp_r[j][i] = z;
 			}			
+
+			if (tmp_r[j][i] > 1.0)
+				tmp_r[j][i] = 1.0;
+			if (tmp_g[j][i] > 1.0)
+				tmp_g[j][i] = 1.0;
+			if (tmp_b[j][i] > 1.0)
+				tmp_b[j][i] = 1.0;
+			if (tmp_r[j][i] < 0.0)
+				tmp_r[j][i] = 0.0;
+			if (tmp_g[j][i] < 0.0)
+				tmp_g[j][i] = 0.0;
+			if (tmp_b[j][i] < 0.0)
+				tmp_b[j][i] = 0.0;
 		}
 	}
 		
@@ -2030,20 +2041,7 @@ void HSItoRGB(CDib *dst, CDib *hue, CDib *sat, CDib *intensity)
 			tmp_r[j][i] *= 255.0;
 			tmp_g[j][i] *= 255.0;
 			tmp_b[j][i] *= 255.0;
-
-			if (tmp_r[j][i] < 0.0 || tmp_g[j][i] < 0.0 || tmp_r[j][i] < 0.0)
-			{
-				tmp_r[j][i] = 0.0;
-				tmp_g[j][i] = 0.0;
-				tmp_b[j][i] = 0.0;
-			}
-			if (tmp_r[j][i] > 255.0 || tmp_g[j][i] > 255.0 || tmp_b[j][i] > 255.0)
-			{
-				tmp_r[j][i] = 255.0;
-				tmp_g[j][i] = 255.0;
-				tmp_b[j][i] = 255.0;
-			}
-
+			
 			dst_ptr[j][i].r = (int)round(tmp_r[j][i]);
 			dst_ptr[j][i].g = (int)round(tmp_g[j][i]);
 			dst_ptr[j][i].b = (int)round(tmp_b[j][i]);
