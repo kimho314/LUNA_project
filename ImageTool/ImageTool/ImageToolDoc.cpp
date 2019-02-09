@@ -319,7 +319,7 @@ void CImageToolDoc::OnHistoEq()
 
 	// get CDF of histogram
 	int eq_hist[TOTAL_INTENSITY_LEVEL] = { 0 };
-	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
+	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)                                    
 	{
 		eq_hist[i] = (int)round(s_k[i]);
 		//printf("idx : %3d eq : %3d\n", i, eq_hist[i]);
@@ -635,19 +635,21 @@ void CImageToolDoc::OnLocalHistStats()
 	BYTE** src_ptr = dib.GetPtr();
 	CDib des_dib;
 	des_dib.CreateGrayImage(w, h);	
-	BYTE** des_ptr = des_dib.GetPtr();
-	
-	/*int test_cnt = 0;
+	BYTE** des_ptr = des_dib.GetPtr();	
+
+	CDib des_dib2;
+	des_dib2.CreateGrayImage(w, h);
+	BYTE** des_ptr2 = des_dib2.GetPtr();
+
 	for (int j = 0; j < h; j++)
 	{
 		for (int i = 0; i < w; i++)
 		{
-			if(src_ptr[j][i] <= 20)
-				test_cnt++;
+			des_ptr2[j][i] = src_ptr[j][i];
 		}
 	}
-	printf("cnt : %5d size : %5d\n", test_cnt, total_num_pixels);*/
-	
+	AfxNewImage(des_dib2);
+
 	CHistogramDlg dlg;
 	// compute histogram
 	dlg.SetImage(&m_Dib);
@@ -667,27 +669,23 @@ void CImageToolDoc::OnLocalHistStats()
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
 	{
 		global_mean += (double)i * (double)norm_hist[i];
-	}
-
-	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
-	{		
 		global_variance += pow((i - global_mean), 2) * norm_hist[i];
 	}
-	global_standard_deviation = sqrt(global_variance);
+	global_standard_deviation = sqrt(global_variance);	
 	//printf("global_mean : %.5f globaL_var : %.5f", global_mean, global_variance);
 
 	int window_size = 3;
-	int half_w_size = window_size / 2; // 1
+	int half_window_size = window_size / 2; // 1
 
-	double c = 22.8;
-	double k0 = 0.0;
-	double k1 = 0.1;
-	double k2 = 0.0;
-	double k3 = 0.1;
+	const double c = 22.8;
+	const double k0 = 0.0;
+	const double k1 = 0.1;
+	const double k2 = 0.0;
+	const double k3 = 0.1;
 
-	for (int j = 1; j < h - 1; j++)
+	for (int j = half_window_size; j < h - half_window_size; j++)
 	{
-		for (int i = 1; i < w - 1; i++)
+		for (int i = half_window_size; i < w - half_window_size; i++)
 		{
 			int n_cnt = window_size * window_size;
 			double local_mean = 0.0;
@@ -697,9 +695,10 @@ void CImageToolDoc::OnLocalHistStats()
 			int local_hist[TOTAL_INTENSITY_LEVEL] = { 0 };
 			double norm_local_hist[TOTAL_INTENSITY_LEVEL] = { 0 };
 
-			for (int y = -half_w_size; y <= half_w_size; y++)
+			// windowing for getting local normalized histogram
+			for (int y = -half_window_size; y <= half_window_size; y++)
 			{
-				for (int x = -half_w_size; x <= half_w_size; x++)
+				for (int x = -half_window_size; x <= half_window_size; x++)
 				{
 					// coordinate of the center pixel
 					int px = i + x; 
@@ -708,26 +707,23 @@ void CImageToolDoc::OnLocalHistStats()
 					// get unnormalized histogram in the neighthood
 					local_hist[src_ptr[py][px]]++;
 					// get normalized histogram in the neighborhood
-					norm_local_hist[src_ptr[py][px]] = local_hist[src_ptr[py][px]] / n_cnt;
+					norm_local_hist[src_ptr[py][px]] = (double)local_hist[src_ptr[py][px]] / (double)n_cnt;
 				}
 			}			
 
 			for (int k = 0; k < TOTAL_INTENSITY_LEVEL; k++)
 			{
 				local_mean += (double)k * (double)norm_local_hist[i];
-			}
-
-			for (int k = 0; k < TOTAL_INTENSITY_LEVEL; k++)
-			{				
 				local_variance += pow((k - local_mean), 2) * norm_local_hist[i];
 			}
 			local_standard_deviation = sqrt(local_variance);
+			
 
 			if (((k0 * global_mean) <= local_mean) && ((k1 * global_mean) >= local_mean) &&
 				((k2 * global_standard_deviation) <= local_standard_deviation) && 
 				((k3 * global_standard_deviation) >= local_standard_deviation))
 			{
-				des_ptr[j][i] = (int)(c * src_ptr[j][i] + 0.5);				
+				des_ptr[j][i] = (int)(c * src_ptr[j][i]);
 			}
 			else
 			{
@@ -756,8 +752,7 @@ void CImageToolDoc::OnGammaTrans()
 	CGammaTransDlg dlg;
 
 	if (dlg.DoModal() == IDOK)
-	{
-		//double c = 1.0f; // constant
+	{		
 		double c = dlg.GetConst();
 		double gamma = dlg.GetGamma();
 
@@ -800,8 +795,7 @@ void CImageToolDoc::OnLogTrans()
 		{
 			for (int i = 0; i < w; i++)
 			{
-				desSrc[j][i] = c * log((double)((double)1 + (double)ptrSrc[j][i] / 255.0f)) * 255;
-				
+				desSrc[j][i] = c * log((double)((double)1 + (double)ptrSrc[j][i] / 255.0f)) * 255;				
 			}
 		}
 
@@ -902,19 +896,15 @@ void CreateGaussainKernel(double **kernel, int kernel_size, double k, double sig
 			sum += kernel[s + half_size][t + half_size];
 		}
 	}
-
-
-	//printf("sum : %.4f\n", sum);
+	
+	
 	for (int s = 0; s < kernel_size; s++)
 	{
 		for (int t = 0; t < kernel_size; t++)
 		{
-			kernel[s][t] /= (double)sum;
-			//printf("%.4f  ", kernel[s][t]);
-		}
-		//printf("\n");
+			kernel[s][t] /= (double)sum;			
+		}		
 	}	
-	//printf("\n");
 }
 
 void CImageToolDoc::OnGaussianfilter()
@@ -939,8 +929,7 @@ void CImageToolDoc::OnGaussianfilter()
 
 	// create Gaussian kernel
 	CreateGaussainKernel(Gaussian_filter21, 21, 1.0, 3.5);
-	CreateGaussainKernel(Gaussian_filter43, 43, 1.0, 7.0);
-	//CreateGaussainKernel(Gaussian_filter21, 3, 1.0, 1.0);
+	CreateGaussainKernel(Gaussian_filter43, 43, 1.0, 7.0);	
 
 	// operate convolution a image with box filters
 	CConvOp conv;
@@ -1121,33 +1110,8 @@ void ElementwiseSum(CDib *dst, CDib *src1, CDib *src2, int kernel_size = 0)
 	BYTE** src2_ptr = src2->GetPtr();
 	BYTE** src1_ptr = src1->GetPtr();
 	BYTE** dst_ptr = dst->GetPtr();
+	
 
-	CDib tmp_dib;
-	tmp_dib.CreateGrayImage(dst_w, dst_h, 0);
-	BYTE** tmp_ptr = tmp_dib.GetPtr();
-
-	if ((src2_w != src1_w) || (src2_w != src2_h))
-	{
-		for (int j = 0; j < src2_h; j++)
-		{
-			for (int i = 0; i < src2_w; i++)
-			{
-				int py = j + half_ker_size;
-				int px = i + half_ker_size;
-				tmp_ptr[py][px] = src2_ptr[j][i];
-			}
-		}
-	}
-	else
-	{
-		for (int j = 0; j < src2_h; j++)
-		{
-			for (int i = 0; i < src2_w; i++)
-			{				
-				tmp_ptr[j][i] = src2_ptr[j][i];
-			}
-		}
-	}	
 
 	double** sum_arr = nullptr;
 	sum_arr = new double*[dst_h];
@@ -1157,13 +1121,11 @@ void ElementwiseSum(CDib *dst, CDib *src1, CDib *src2, int kernel_size = 0)
 	for (int j = 0; j < dst_h; j++)
 	{
 		for (int i = 0; i < dst_w; i++)
-		{			
-			sum_arr[j][i] = tmp_ptr[j][i] + src1_ptr[j][i];
+		{				
+			sum_arr[j][i] = src2_ptr[j][i] + src1_ptr[j][i];
 		}
 	}
-
-	//CConvOp conv;
-	//conv.ScaleImageValue(dst, sum_arr);
+	
 
 	for (int j = 0; j < dst_h; j++)
 	{
@@ -1185,41 +1147,13 @@ void ElementwiseMulti(CDib *dst, CDib *src1, CDib *src2, int kernel_size = 0)
 	int src2_w = src2->GetWidth();
 	int src2_h = src2->GetHeight();
 	int dst_w = src1_w;
-	int dst_h = src1_h;
-	int half_ker_size = (kernel_size - 1) / 2;
+	int dst_h = src1_h;	
 
 	dst->CreateGrayImage(dst_w, dst_h, 0);
 	BYTE** src2_ptr = src2->GetPtr();
 	BYTE** src1_ptr = src1->GetPtr();
-	BYTE** dst_ptr = dst->GetPtr();
+	BYTE** dst_ptr = dst->GetPtr();	
 
-	CDib tmp_dib;
-	tmp_dib.CreateGrayImage(dst_w, dst_h, 0);
-	BYTE** tmp_ptr = tmp_dib.GetPtr();
-
-	if ((src2_w != src1_w) || (src2_w != src1_h))
-	{
-		for (int j = 0; j < src2_h; j++)
-		{
-			for (int i = 0; i < src2_w; i++)
-			{
-				int py = j + half_ker_size;
-				int px = i + half_ker_size;
-				tmp_ptr[py][px] = src2_ptr[j][i];
-			}
-		}
-	}
-	else
-	{
-		for (int j = 0; j < src2_h; j++)
-		{
-			for (int i = 0; i < src2_w; i++)
-			{
-				tmp_ptr[j][i] = src2_ptr[j][i];
-			}
-		}
-	}
-		
 	double** multi_arr = nullptr;
 	multi_arr = new double*[dst_h];
 	for (int i = 0; i < dst_h; i++)
@@ -1228,8 +1162,8 @@ void ElementwiseMulti(CDib *dst, CDib *src1, CDib *src2, int kernel_size = 0)
 	for (int j = 0; j < dst_h; j++)
 	{
 		for (int i = 0; i < dst_w; i++)
-		{			
-			multi_arr[j][i] = tmp_ptr[j][i] * src1_ptr[j][i];
+		{					
+			multi_arr[j][i] = src2_ptr[j][i] * src1_ptr[j][i];
 		}
 	}
 
@@ -1342,6 +1276,7 @@ void CImageToolDoc::OnSpatialfiltering()
 	CConvOp conv;
 	conv.Convolution(&dib_des_b, &dib_src, laplacian, 3, 0, 1);	
 	//AfxNewImage(dib_des_b); // (b)
+	
 	
 	ElementwiseSum(&dib_des_c, &dib_des_b, &dib_src, 3);
 	AfxNewImage(dib_des_c); // (c)
@@ -2090,10 +2025,7 @@ void CImageToolDoc::OnColorComplement()
 		hue_dib.CreateGrayImage(w, h);
 		sat_dib.CreateGrayImage(w, h);
 		int_dib.CreateGrayImage(w, h);
-
-		//GetHueComponent(&hue_dib, &src_dib);		
-		//GetSatComponent(&sat_dib, &src_dib);		
-		//GetIntComponent(&int_dib, &src_dib);
+		
 		RGBtoHSI(&hue_dib, &sat_dib, &int_dib, &src_dib);
 		
 		CDib hue_complement;

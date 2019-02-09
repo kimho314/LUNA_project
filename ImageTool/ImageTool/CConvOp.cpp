@@ -22,8 +22,8 @@ void CConvOp::Convolution(CDib *dst, CDib *src, double **kernel, int kernel_size
 	int dst_h = src_h + (kernel_size - 1);	
 	int half_ker_size = (kernel_size - 1) / 2; 
 
-	dst->CreateGrayImage(dst_w, dst_h, 0);
-	//dst->Copy(src);
+	dst->CreateGrayImage(src_w, src_h, 0);
+	dst->Copy(src);
 	BYTE** src_ptr = src->GetPtr();
 	BYTE** dst_ptr = dst->GetPtr();
 
@@ -39,16 +39,6 @@ void CConvOp::Convolution(CDib *dst, CDib *src, double **kernel, int kernel_size
 		{
 			int py = j + half_ker_size;
 			int px = i + half_ker_size;
-			dst_ptr[py][px] = src_ptr[j][i];
-		}
-	}
-
-	for (int j = 0; j < src_h; j++)
-	{
-		for (int i = 0; i < src_w; i++)
-		{
-			int py = j + half_ker_size;
-			int px = i + half_ker_size;
 			tmp_ptr[py][px] = src_ptr[j][i];
 		}
 	}
@@ -56,26 +46,29 @@ void CConvOp::Convolution(CDib *dst, CDib *src, double **kernel, int kernel_size
 
 	// padding
 	if (padding_op == MIRROR)
-	{
-		MirrorPadFunc(dst, src, kernel_size);
+	{		
+		MirrorPadFunc(&tmp_dib, src, kernel_size);
 	}
 	else if (padding_op == REPLICATE)
-	{
-		ReplicatePadFunc(dst, src, kernel_size);
+	{		
+		ReplicatePadFunc(&tmp_dib, src, kernel_size);
 	}
 
 	double **sum_arr = nullptr;
 	sum_arr = new double*[dst_h];
 	for (int i = 0; i < dst_h; i++)
 		sum_arr[i] = new double[dst_w];
+	
 
 	for (int j = 0; j < dst_h; j++)
 	{
 		for (int i = 0; i < dst_w; i++)
 		{
-			sum_arr[j][i] = 0.0f;
+			sum_arr[j][i] = 0.0f;			
 		}
-	}
+	}		
+	
+
 
 	// operate convolution
 	for (int j = half_ker_size; j < src_h + half_ker_size; j++)
@@ -90,46 +83,38 @@ void CConvOp::Convolution(CDib *dst, CDib *src, double **kernel, int kernel_size
 				{
 					sum += kernel[s + half_ker_size][t + half_ker_size] * tmp_ptr[j - s][i - t];
 				}
-			}
+			}	
+			
 
-			if (scale_op == 0)
-			{
-				if (sum < 0.0)
-					sum = 0.0;
-				if (sum > 255.0)
-					sum = 255.0;
-				dst_ptr[j][i] = sum;
-			}
-			else
+			if (scale_op == 1)
 			{
 				sum_arr[j][i] = sum;
 			}
+
+			if (sum < 0.0)
+				sum = 0.0;
+			if (sum > 255.0)
+				sum = 255.0;
 			
+			dst_ptr[j - half_ker_size][i - half_ker_size] = sum;
 		}
 	}		
 	
+	// scaling values over range [0,255]
 	if (scale_op == 1)
 	{
-		CDib tmp_dib2;
-		tmp_dib2.CreateGrayImage(dst_w, dst_h, 0);
-		ScaleImageValue(&tmp_dib2, sum_arr);
-		AfxNewImage(tmp_dib2);
-		for (int j = 0; j < dst_h; j++)
-		{
-			for (int i = 0; i < dst_w; i++)
-			{
-				if (sum_arr[j][i] < 0.0)
-					sum_arr[j][i] = 0.0;
-				if (sum_arr[j][i] > 255.0)
-					sum_arr[j][i] = 255.0;
-				dst_ptr[j][i] = sum_arr[j][i];
-			}
-		}
+		CDib tmp_dib2;		
+		tmp_dib2.CreateGrayImage(src_w, src_h);
+		ScaleImageValue(&tmp_dib2, sum_arr);		
+
+		AfxNewImage(tmp_dib2);		
 	}
 
 	for (int i = 0; i < dst_h; i++)
-		delete(sum_arr[i]);
-	delete(sum_arr);
+	{
+		delete(sum_arr[i]);		
+	}	
+	delete(sum_arr);	
 }
 
 void CConvOp::ReplicatePadFunc(CDib *dst, CDib *src, int kernel_size)
