@@ -635,32 +635,20 @@ void CImageToolDoc::OnLocalHistStats()
 	BYTE** src_ptr = dib.GetPtr();
 	CDib des_dib;
 	des_dib.CreateGrayImage(w, h);	
+	des_dib.Copy(&dib);
 	BYTE** des_ptr = des_dib.GetPtr();	
-
-	CDib des_dib2;
-	des_dib2.CreateGrayImage(w, h);
-	BYTE** des_ptr2 = des_dib2.GetPtr();
-
-	for (int j = 0; j < h; j++)
-	{
-		for (int i = 0; i < w; i++)
-		{
-			des_ptr2[j][i] = src_ptr[j][i];
-		}
-	}
-	AfxNewImage(des_dib2);
+	
 
 	CHistogramDlg dlg;
 	// compute histogram
-	dlg.SetImage(&m_Dib);
+	//dlg.SetImage(&m_Dib);
+	dlg.SetImage(&des_dib);
 	
 	float *norm_hist = NULL;
 
 	// get normalzied histogram
 	norm_hist = dlg.GetHistogram();	
-
-	// show origian image's histogram	
-	//dlg.DoModal();
+		
 
 	double global_mean = 0.0;
 	double global_variance = 0.0;
@@ -705,9 +693,9 @@ void CImageToolDoc::OnLocalHistStats()
 					int py = j + y;
 
 					// get unnormalized histogram in the neighthood
-					local_hist[src_ptr[py][px]]++;
+					local_hist[des_ptr[py][px]]++;
 					// get normalized histogram in the neighborhood
-					norm_local_hist[src_ptr[py][px]] = (double)local_hist[src_ptr[py][px]] / (double)n_cnt;
+					norm_local_hist[des_ptr[py][px]] = (double)local_hist[des_ptr[py][px]] / (double)n_cnt;
 				}
 			}			
 
@@ -723,11 +711,11 @@ void CImageToolDoc::OnLocalHistStats()
 				((k2 * global_standard_deviation) <= local_standard_deviation) && 
 				((k3 * global_standard_deviation) >= local_standard_deviation))
 			{
-				des_ptr[j][i] = (int)(c * src_ptr[j][i]);
+				des_ptr[j][i] = (int)(c * des_ptr[j][i]);
 			}
 			else
 			{
-				des_ptr[j][i] = src_ptr[j][i];
+				des_ptr[j][i] = des_ptr[j][i];
 			}			
 		}
 	}	
