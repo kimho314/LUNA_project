@@ -636,24 +636,11 @@ void CImageToolDoc::OnLocalHistStats()
 	CDib dst_dib;
 	dst_dib.CreateGrayImage(w, h);	
 	//dst_dib.Copy(&src_dib);
-	BYTE** dst_ptr = dst_dib.GetPtr();	
-	
-	double **tmp_arr = nullptr;
-	tmp_arr = new double*[h];
-	for (int i = 0; i < h; i++)
-		tmp_arr[i] = new double[w];
-	for (int j = 0; j < h; j++)
-	{
-		for (int i = 0; i < w; i++)
-		{
-			tmp_arr[j][i] = 0.0;
-		}
-	}
+	BYTE** dst_ptr = dst_dib.GetPtr();		
 
 	CHistogramDlg dlg;
 	// compute histogram
-	dlg.SetImage(&src_dib);
-	
+	dlg.SetImage(&src_dib);	
 
 	// get normalzied histogram
 	float *norm_hist = NULL;
@@ -746,11 +733,7 @@ void CImageToolDoc::OnLocalHistStats()
 		}
 	}	
 
-	AfxNewImage(dst_dib);
-
-	for (int i = 0; i < h; i++)
-		delete(tmp_arr[i]);
-	delete(tmp_arr);
+	AfxNewImage(dst_dib);	
 }
 
 
