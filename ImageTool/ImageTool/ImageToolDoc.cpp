@@ -367,8 +367,7 @@ void CImageToolDoc::OnHistogram()
 
 void CImageToolDoc::OnHistoMatch()
 {
-	// TODO: Add your command handler code here
-	
+	// TODO: Add your command handler code here	
 	int w = m_Dib.GetWidth();
 	int h = m_Dib.GetHeight();
 
@@ -422,7 +421,6 @@ void CImageToolDoc::OnHistoMatch()
 		}
 	}
 
-
 	// get normalzied histogram of specified PDF
 	double  nor_pz[TOTAL_INTENSITY_LEVEL] = { 0.0f };
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
@@ -438,7 +436,6 @@ void CImageToolDoc::OnHistoMatch()
 		g_z[i] = (TOTAL_INTENSITY_LEVEL - 1) * nor_pz[i] + g_z[i - 1];		
 	}
 	
-
 	// get CDF of histogram
 	int eq_gz[TOTAL_INTENSITY_LEVEL] = { 0 };
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
@@ -447,11 +444,9 @@ void CImageToolDoc::OnHistoMatch()
 	}
 	
 
-	// mapping eq_gz into the closest s_k
-	int min_diff = 0;
+	// mapping eq_gz into the closest s_k	
 	int min_idx = 0;
-	int diff_arr[TOTAL_INTENSITY_LEVEL] = { 0 };
-	//int hist_match_arr[TOTAL_INTENSITY_LEVEL] = { 0 }; // idx = eq_hist, val = eq_gz
+	int diff_arr[TOTAL_INTENSITY_LEVEL] = { 0 };	
 	int hist_inv_match_arr[TOTAL_INTENSITY_LEVEL] = { 0 };
 
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++) // index of s_k
@@ -461,43 +456,27 @@ void CImageToolDoc::OnHistoMatch()
 			diff_arr[j] = abs(eq_hist[i] - eq_gz[j]); // eq_hist = s_k, eq_gz = g(z)
 		}
 
-		min_diff = diff_arr[0];
+		
 		for (int j = 1; j < TOTAL_INTENSITY_LEVEL; j++)
 		{
-			if (min_diff > diff_arr[j])
-			{
-				min_diff = diff_arr[j];
+			if (diff_arr[min_idx] > diff_arr[j])
+			{				
 				min_idx = j;
 			}
 		}		
-
-		//hist_match_arr[i] = eq_gz[min_idx]; // s_k -> G(z_q)
+				
 		// i : index of s_k, hist_inv_match_arr : z_q corresponding to s_k
-		hist_inv_match_arr[i] = min_idx; // s_k -> z_q
+		hist_inv_match_arr[eq_hist[i]] = min_idx; // s_k(i) -> z_q		
 		memset(diff_arr, 0, sizeof(diff_arr));
 	}	
-	
+			
 
-	// inverse mapping
-	float new_specified_hist[TOTAL_INTENSITY_LEVEL] = { 0 };
-	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
-	{		
-		new_specified_hist[i] = (int)round(eq_hist[hist_inv_match_arr[i]]);
-	}
-		
-
-	// get equalized image
+	// implement inverse mappint and get equalized image
 	for (int j = 0; j < h; j++)
 	{
 		for (int i = 0; i < w; i++)
-		{
-			for (int k = 0; k < TOTAL_INTENSITY_LEVEL; k++)
-			{
-				if (src_ptr[j][i] == k)
-				{					
-					des_ptr[j][i] = new_specified_hist[k];
-				}
-			}
+		{			
+			des_ptr[j][i] = hist_inv_match_arr[eq_hist[src_ptr[j][i]]];
 		}
 	}	
 
