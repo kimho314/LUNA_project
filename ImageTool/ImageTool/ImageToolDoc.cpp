@@ -634,19 +634,17 @@ void CImageToolDoc::OnLocalHistStats()
 	CDib dib = m_Dib;
 	BYTE** src_ptr = dib.GetPtr();
 	CDib des_dib;
-	des_dib.CreateGrayImage(w, h);	
-	des_dib.Copy(&dib);
+	des_dib.CreateGrayImage(w, h);		
 	BYTE** des_ptr = des_dib.GetPtr();	
 	
 
 	CHistogramDlg dlg;
 	// compute histogram
-	//dlg.SetImage(&m_Dib);
-	dlg.SetImage(&des_dib);
+	dlg.SetImage(&dib);
 	
-	float *norm_hist = NULL;
 
 	// get normalzied histogram
+	float *norm_hist = NULL;
 	norm_hist = dlg.GetHistogram();	
 		
 
@@ -656,7 +654,11 @@ void CImageToolDoc::OnLocalHistStats()
 
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
 	{
-		global_mean += (double)i * (double)norm_hist[i];
+		global_mean += (double)i * (double)norm_hist[i];		
+	}
+
+	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
+	{		
 		global_variance += pow((i - global_mean), 2) * norm_hist[i];
 	}
 	global_standard_deviation = sqrt(global_variance);	
@@ -681,7 +683,7 @@ void CImageToolDoc::OnLocalHistStats()
 			double local_standard_deviation = 0.0;
 
 			int local_hist[TOTAL_INTENSITY_LEVEL] = { 0 };
-			double norm_local_hist[TOTAL_INTENSITY_LEVEL] = { 0 };
+			double norm_local_hist[TOTAL_INTENSITY_LEVEL] = { 0.0 };
 
 			// windowing for getting local normalized histogram
 			for (int y = -half_window_size; y <= half_window_size; y++)
@@ -693,15 +695,23 @@ void CImageToolDoc::OnLocalHistStats()
 					int py = j + y;
 
 					// get unnormalized histogram in the neighthood
-					local_hist[des_ptr[py][px]]++;
-					// get normalized histogram in the neighborhood
-					norm_local_hist[des_ptr[py][px]] = (double)local_hist[des_ptr[py][px]] / (double)n_cnt;
+					local_hist[src_ptr[py][px]]++;					
 				}
 			}			
 
+			// get normalized histogram in the neighborhood
 			for (int k = 0; k < TOTAL_INTENSITY_LEVEL; k++)
 			{
-				local_mean += (double)k * (double)norm_local_hist[i];
+				norm_local_hist[k] = (double)local_hist[k] / (double)n_cnt;
+			}
+
+			for (int k = 0; k < TOTAL_INTENSITY_LEVEL; k++)
+			{
+				local_mean += (double)k * (double)norm_local_hist[i];				
+			}
+
+			for (int k = 0; k < TOTAL_INTENSITY_LEVEL; k++)
+			{				
 				local_variance += pow((k - local_mean), 2) * norm_local_hist[i];
 			}
 			local_standard_deviation = sqrt(local_variance);
@@ -711,11 +721,11 @@ void CImageToolDoc::OnLocalHistStats()
 				((k2 * global_standard_deviation) <= local_standard_deviation) && 
 				((k3 * global_standard_deviation) >= local_standard_deviation))
 			{
-				des_ptr[j][i] = (int)(c * des_ptr[j][i]);
+				des_ptr[j][i] = (int)(c * src_ptr[j][i]);
 			}
 			else
 			{
-				des_ptr[j][i] = des_ptr[j][i];
+				des_ptr[j][i] = src_ptr[j][i];
 			}			
 		}
 	}	
