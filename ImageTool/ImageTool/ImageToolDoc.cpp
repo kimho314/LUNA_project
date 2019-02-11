@@ -583,6 +583,7 @@ void CImageToolDoc::OnLocalHistEq()
 }
 
 
+
 void CImageToolDoc::OnLocalHistStats()
 {
 	// TODO: Add your command handler code here
@@ -590,107 +591,112 @@ void CImageToolDoc::OnLocalHistStats()
 	int h = m_Dib.GetHeight();
 	int total_num_pixels = w * h;
 
-	CDib src_dib = m_Dib;
-	BYTE** src_ptr = src_dib.GetPtr();
-	CDib dst_dib;
-	dst_dib.CreateGrayImage(w, h);	
-	//dst_dib.Copy(&src_dib);
-	BYTE** dst_ptr = dst_dib.GetPtr();		
-
-	CHistogramDlg dlg;
-	// compute histogram
-	dlg.SetImage(&src_dib);	
-
-	// get normalzied histogram
-	double *norm_hist = NULL;
-	norm_hist = dlg.GetHistogram();	
-		
-
-	double global_mean = 0.0;
-	double global_variance = 0.0;
-	double global_standard_deviation = 0.0;
-
-	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
+	if (m_Dib.GetBitCount() == 8)
 	{
-		global_mean += ((double)i * (double)norm_hist[i]);		
-	}
+		CDib src_dib = m_Dib;
+		BYTE** src_ptr = src_dib.GetPtr();
+		CDib dst_dib;
+		dst_dib.CreateGrayImage(w, h);		
+		//dst_dib.Copy(&src_dib);
+		BYTE** dst_ptr = dst_dib.GetPtr();		
 
-	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
-	{		
-		global_variance += (pow((i - global_mean), 2) * (double)norm_hist[i]);
-	}
-	global_standard_deviation = sqrt(global_variance);	
-	//printf("global_mean : %.5f globaL_var : %.5f", global_mean, global_variance);
+		CHistogramDlg dlg;
+		// compute histogram
+		dlg.SetImage(&src_dib);
 
-	int window_size = 3;
-	int half_window_size = (window_size - 1) / 2; // 1
-	int local_cnt = window_size * window_size;
+		// get normalzied histogram
+		double *norm_hist = NULL;
+		norm_hist = dlg.GetHistogram();
 
-	const double c = 22.8;
-	const double k0 = 0.0;
-	const double k1 = 0.1;
-	const double k2 = 0.0;
-	const double k3 = 0.1;
 
-	for (int j = half_window_size; j < h - half_window_size; j++)
-	{
-		for (int i = half_window_size; i < w - half_window_size; i++)
-		{			
-			double local_mean = 0.0;
-			double local_variance = 0.0;
-			double local_standard_deviation = 0.0;
+		double global_mean = 0.0;
+		double global_variance = 0.0;
+		double global_standard_deviation = 0.0;
 
-			int local_hist[TOTAL_INTENSITY_LEVEL] = { 0 };
-			double norm_local_hist[TOTAL_INTENSITY_LEVEL] = { 0.0 };
-
-			// windowing for getting local normalized histogram
-			for (int y = -half_window_size; y <= half_window_size; y++)
-			{
-				for (int x = -half_window_size; x <= half_window_size; x++)
-				{
-					// coordinate of the center pixel
-					int px = i + x; 
-					int py = j + y;
-
-					// get unnormalized histogram in the neighthood
-					local_hist[src_ptr[py][px]]++;
-				}
-			}			
-
-			// get normalized histogram in the neighborhood
-			for (int k = 0; k < TOTAL_INTENSITY_LEVEL; k++)
-			{
-				norm_local_hist[k] = (double)local_hist[k] / (double)local_cnt;
-			}
-
-			// get local mean
-			for (int k = 0; k < TOTAL_INTENSITY_LEVEL; k++)
-			{
-				local_mean += (double)k * (double)norm_local_hist[k];				
-			}
-
-			// get local standard deviation
-			for (int k = 0; k < TOTAL_INTENSITY_LEVEL; k++)
-			{				
-				local_variance += (pow((k - local_mean), 2) * norm_local_hist[k]);
-			}
-			local_standard_deviation = sqrt(local_variance);
-			
-
-			if ((((k0 * global_mean) <= local_mean) && ((k1 * global_mean) >= local_mean)) &&
-				(((k2 * global_standard_deviation) <= local_standard_deviation) && 
-				((k3 * global_standard_deviation) >= local_standard_deviation)))
-			{
-				dst_ptr[j][i] = (int)(c * src_ptr[j][i]);				
-			}
-			else
-			{			
-				dst_ptr[j][i] = src_ptr[j][i] * 255;				
-			}			
+		for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
+		{
+			global_mean += ((double)i * (double)norm_hist[i]);
 		}
-	}	
 
-	AfxNewImage(dst_dib);	
+		for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
+		{
+			global_variance += (pow((i - global_mean), 2) * (double)norm_hist[i]);
+		}
+		global_standard_deviation = sqrt(global_variance);
+		//printf("global_mean : %.5f globaL_var : %.5f", global_mean, global_variance);
+
+		int window_size = 3;
+		int half_window_size = (window_size - 1) / 2; // 1
+		int local_cnt = window_size * window_size;
+
+		const double c = 22.8;
+		const double k0 = 0.0;
+		const double k1 = 0.1;
+		const double k2 = 0.0;
+		const double k3 = 0.1;
+
+		for (int j = half_window_size; j < h - half_window_size; j++)
+		{
+			for (int i = half_window_size; i < w - half_window_size; i++)
+			{
+				double local_mean = 0.0;
+				double local_variance = 0.0;
+				double local_standard_deviation = 0.0;
+
+				int local_hist[TOTAL_INTENSITY_LEVEL] = { 0 };
+				double norm_local_hist[TOTAL_INTENSITY_LEVEL] = { 0.0 };
+
+				// windowing for getting local normalized histogram
+				for (int y = -half_window_size; y <= half_window_size; y++)
+				{
+					for (int x = -half_window_size; x <= half_window_size; x++)
+					{
+						// coordinate of the center pixel
+						int px = i + x;
+						int py = j + y;
+
+						// get unnormalized histogram in the neighthood
+						local_hist[src_ptr[py][px]]++;
+					}
+				}
+
+				// get normalized histogram in the neighborhood
+				for (int k = 0; k < TOTAL_INTENSITY_LEVEL; k++)
+				{
+					norm_local_hist[k] = (double)local_hist[k] / (double)local_cnt;
+				}
+
+				// get local mean
+				for (int k = 0; k < TOTAL_INTENSITY_LEVEL; k++)
+				{
+					local_mean += (double)k * (double)norm_local_hist[k];
+				}
+
+				// get local standard deviation
+				for (int k = 0; k < TOTAL_INTENSITY_LEVEL; k++)
+				{
+					local_variance += (pow((k - local_mean), 2) * norm_local_hist[k]);
+				}
+				local_standard_deviation = sqrt(local_variance);				
+
+
+				if (((k0 * global_mean) <= local_mean) && ((k1 * global_mean) >= local_mean))
+				{
+					if (((k2 * global_standard_deviation) <= local_standard_deviation) &&
+						((k3 * global_standard_deviation) >= local_standard_deviation))
+					{
+						dst_ptr[j][i] = (int)((double)c * (double)src_ptr[j][i]);
+					}
+					else
+					{
+						dst_ptr[j][i] = src_ptr[j][i];
+					}
+				}				
+			}
+		}
+
+		AfxNewImage(dst_dib);
+	}
 }
 
 
