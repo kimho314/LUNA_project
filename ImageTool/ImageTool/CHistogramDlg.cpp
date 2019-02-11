@@ -43,7 +43,7 @@ void CHistogramDlg::SetImage(CDib *pDib)
 	{
 		BYTE** histoPtr = pDib->GetPtr();
 		
-		float histo[256] = { 0 };
+		double histo[256] = { 0 };
 
 		int w = pDib->GetWidth();
 		int h = pDib->GetHeight();
@@ -124,7 +124,7 @@ void CHistogramDlg::OnPaint()
 }
 
 
-float* CHistogramDlg::GetHistogram()
+double* CHistogramDlg::GetHistogram()
 {
 	// TODO: Add your implementation code here.
 	return m_norHistogram;

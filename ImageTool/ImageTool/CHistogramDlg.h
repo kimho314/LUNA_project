@@ -13,7 +13,7 @@ public:
 	virtual ~CHistogramDlg();
 
 	int m_Histogram[256];
-	float m_norHistogram[256];
+	double m_norHistogram[256];
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
@@ -27,7 +27,7 @@ protected:
 public:
 	void SetImage(CDib *pDib);
 	afx_msg void OnPaint();
-	float* GetHistogram();
+	double* GetHistogram();
 	void UpdateHistogram(int *histo);
 	void PrintHistogram(float *histo);
 };

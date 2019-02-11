@@ -297,7 +297,7 @@ void CImageToolDoc::OnHistoEq()
 	
 
 	int total_num_pixels = w * h;	
-	float *normalized_hist = NULL;	
+	double *normalized_hist = NULL;	
 
 	// get normalzied histogram
 	normalized_hist = dlg.GetHistogram();
@@ -313,21 +313,17 @@ void CImageToolDoc::OnHistoEq()
 	s_k[0] = normalized_hist[0];
 	for (int i = 1; i < TOTAL_INTENSITY_LEVEL; i++)
 	{
-		s_k[i] = (TOTAL_INTENSITY_LEVEL - 1) * normalized_hist[i] + s_k[i - 1];
-		//printf("idx : %3d s_k : %.5f\n", i, s_k[i]);
+		s_k[i] = (TOTAL_INTENSITY_LEVEL - 1) * normalized_hist[i] + s_k[i - 1];		
 	}
 
 	// get CDF of histogram
 	int eq_hist[TOTAL_INTENSITY_LEVEL] = { 0 };
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)                                    
 	{
-		eq_hist[i] = (int)round(s_k[i]);
-		//printf("idx : %3d eq : %3d\n", i, eq_hist[i]);
+		eq_hist[i] = (int)round(s_k[i]);		
 	}
 
-	// show CDF
-	//dlg.UpdateHistogram(eq_hist);
-	//dlg.DoModal();
+	
 
 	// get equalized image
 	for (int j = 0; j < h; j++)
@@ -387,7 +383,7 @@ void CImageToolDoc::OnHistoMatch()
 	dlg.SetImage(&m_Dib);
 
 	int total_num_pixels = w * h;
-	float *normalized_hist = NULL;
+	double *normalized_hist = NULL;
 
 	// get normalzied histogram
 	normalized_hist = dlg.GetHistogram();
@@ -402,21 +398,15 @@ void CImageToolDoc::OnHistoMatch()
 	s_k[0] = normalized_hist[0];
 	for (int i = 1; i < TOTAL_INTENSITY_LEVEL; i++)
 	{
-		s_k[i] = (TOTAL_INTENSITY_LEVEL - 1) * normalized_hist[i] + s_k[i - 1];
-		//printf("idx : %3d s_k : %.5f\n", i, s_k[i]);
+		s_k[i] = (TOTAL_INTENSITY_LEVEL - 1) * normalized_hist[i] + s_k[i - 1];		
 	}
 
 	// get CDF of histogram
 	int eq_hist[TOTAL_INTENSITY_LEVEL] = { 0 };
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
 	{
-		eq_hist[i] = (int)round(s_k[i]);
-		//printf("idx : %3d eq : %3d\n", i, eq_hist[i]);
-	}
-
-	// show CDF
-	/*dlg.UpdateHistogram(eq_hist);
-	dlg.DoModal();*/
+		eq_hist[i] = (int)round(s_k[i]);		
+	}	
 
 	// get unnormalized histogram of specified PDF
 	int unnor_pz[TOTAL_INTENSITY_LEVEL] = { 0 };
@@ -432,33 +422,20 @@ void CImageToolDoc::OnHistoMatch()
 		}
 	}
 
-	/*for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
-	{
-		printf("idx : %3d pz : %3d\n", i, unnor_pz[i]);
-	}*/
 
 	// get normalzied histogram of specified PDF
 	float  nor_pz[TOTAL_INTENSITY_LEVEL] = { 0.0f };
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
 	{
 		nor_pz[i] = (float)unnor_pz[i] / (float)total_num_pixels;
-	}
-	
-	/*dlg.PrintHistogram(nor_pz);
-	dlg.DoModal();*/
-	/*for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
-	{
-		printf("idx : %3d pz : %.5f\n", i, nor_pz[i]);
-	}*/
-	
+	}	
 
 	// implement equalization
 	float g_z[TOTAL_INTENSITY_LEVEL] = { 0, }; // result intensity after equalization
 	g_z[0] = nor_pz[0];
 	for (int i = 1; i < TOTAL_INTENSITY_LEVEL; i++)
 	{
-		g_z[i] = (TOTAL_INTENSITY_LEVEL - 1) * nor_pz[i] + g_z[i - 1];
-		//printf("idx : %3d g_z : %.5f\n", i, g_z[i]);
+		g_z[i] = (TOTAL_INTENSITY_LEVEL - 1) * nor_pz[i] + g_z[i - 1];		
 	}
 	
 
@@ -466,19 +443,9 @@ void CImageToolDoc::OnHistoMatch()
 	int eq_gz[TOTAL_INTENSITY_LEVEL] = { 0 };
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
 	{
-		eq_gz[i] = (int)round(g_z[i]);
-		//printf("idx : %3d eq_gz : %3d\n", i, eq_gz[i]);
+		eq_gz[i] = (int)round(g_z[i]);		
 	}
-
-	// show CDF
-	/*dlg.UpdateHistogram(eq_gz);
-	dlg.DoModal();*/
 	
-
-	/*for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
-	{
-		printf("idx : %3d eq_hist : %3d eq_gz : %3d\n", i, eq_hist[i], eq_gz[i]);
-	}*/
 
 	// mapping eq_gz into the closest s_k
 	int min_diff = 0;
@@ -508,13 +475,7 @@ void CImageToolDoc::OnHistoMatch()
 		// i : index of s_k, hist_inv_match_arr : z_q corresponding to s_k
 		hist_inv_match_arr[i] = min_idx; // s_k -> G(z_q) -> z_q
 		memset(diff_arr, 0, sizeof(diff_arr));
-	}
-
-	
-	/*for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
-	{
-		printf("s_k : %3d G(z_q) : %3d z_q : %3d\n", eq_hist[i], hist_match_arr[i], hist_inv_match_arr[i]);
-	}*/
+	}	
 	
 
 	// inverse mapping
@@ -524,9 +485,7 @@ void CImageToolDoc::OnHistoMatch()
 		new_specified_hist[hist_inv_match_arr[i]] += normalized_hist[i];
 	}
 
-	/*dlg.PrintHistogram(new_specified_hist);
-	dlg.DoModal();
-	*/
+	
 	int result_new_hist[TOTAL_INTENSITY_LEVEL] = { 0 };
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
 	{
@@ -643,7 +602,7 @@ void CImageToolDoc::OnLocalHistStats()
 	dlg.SetImage(&src_dib);	
 
 	// get normalzied histogram
-	float *norm_hist = NULL;
+	double *norm_hist = NULL;
 	norm_hist = dlg.GetHistogram();	
 		
 
@@ -653,12 +612,12 @@ void CImageToolDoc::OnLocalHistStats()
 
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
 	{
-		global_mean += (double)i * (double)norm_hist[i];		
+		global_mean += ((double)i * (double)norm_hist[i]);		
 	}
 
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
 	{		
-		global_variance += pow((i - global_mean), 2) * norm_hist[i];
+		global_variance += (pow((i - global_mean), 2) * (double)norm_hist[i]);
 	}
 	global_standard_deviation = sqrt(global_variance);	
 	//printf("global_mean : %.5f globaL_var : %.5f", global_mean, global_variance);
@@ -722,13 +681,11 @@ void CImageToolDoc::OnLocalHistStats()
 				(((k2 * global_standard_deviation) <= local_standard_deviation) && 
 				((k3 * global_standard_deviation) >= local_standard_deviation)))
 			{
-				dst_ptr[j][i] = (int)(c * src_ptr[j][i]);
-				
+				dst_ptr[j][i] = (int)(c * src_ptr[j][i]);				
 			}
 			else
 			{			
-				dst_ptr[j][i] = src_ptr[j][i] * 255;
-				
+				dst_ptr[j][i] = src_ptr[j][i] * 255;				
 			}			
 		}
 	}	
