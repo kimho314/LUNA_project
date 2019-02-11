@@ -392,7 +392,7 @@ void CImageToolDoc::OnHistoMatch()
 	//dlg.DoModal();
 
 	// implement histogram equalization	
-	float s_k[TOTAL_INTENSITY_LEVEL] = { 0, }; // result intensity after equalization
+	double s_k[TOTAL_INTENSITY_LEVEL] = { 0, }; // result intensity after equalization
 
 	// implement equalization
 	s_k[0] = normalized_hist[0];
@@ -414,24 +414,24 @@ void CImageToolDoc::OnHistoMatch()
 	{
 		if ((i >= 0) && (i <= 128))
 		{
-			unnor_pz[i] = (int)((float)(-1 * (float)(510 / (float)128)) * i + 510);
+			unnor_pz[i] = (int)((double)(-1 * (double)(510 / (double)128)) * i + 510);
 		}
 		else
 		{
-			unnor_pz[i] = (int)((float)(510 / (float)127) * i - ((510 * 128) / 127));
+			unnor_pz[i] = (int)((double)(510 / (double)127) * i - ((510 * 128) / 127));
 		}
 	}
 
 
 	// get normalzied histogram of specified PDF
-	float  nor_pz[TOTAL_INTENSITY_LEVEL] = { 0.0f };
+	double  nor_pz[TOTAL_INTENSITY_LEVEL] = { 0.0f };
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
 	{
-		nor_pz[i] = (float)unnor_pz[i] / (float)total_num_pixels;
+		nor_pz[i] = (double)unnor_pz[i] / (double)total_num_pixels;
 	}	
 
 	// implement equalization
-	float g_z[TOTAL_INTENSITY_LEVEL] = { 0, }; // result intensity after equalization
+	double g_z[TOTAL_INTENSITY_LEVEL] = { 0, }; // result intensity after equalization
 	g_z[0] = nor_pz[0];
 	for (int i = 1; i < TOTAL_INTENSITY_LEVEL; i++)
 	{
@@ -451,7 +451,7 @@ void CImageToolDoc::OnHistoMatch()
 	int min_diff = 0;
 	int min_idx = 0;
 	int diff_arr[TOTAL_INTENSITY_LEVEL] = { 0 };
-	int hist_match_arr[TOTAL_INTENSITY_LEVEL] = { 0 }; // idx = eq_hist, val = eq_gz
+	//int hist_match_arr[TOTAL_INTENSITY_LEVEL] = { 0 }; // idx = eq_hist, val = eq_gz
 	int hist_inv_match_arr[TOTAL_INTENSITY_LEVEL] = { 0 };
 
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++) // index of s_k
@@ -462,7 +462,7 @@ void CImageToolDoc::OnHistoMatch()
 		}
 
 		min_diff = diff_arr[0];
-		for (int j = 1; j < TOTAL_INTENSITY_LEVEL - 1; j++)
+		for (int j = 1; j < TOTAL_INTENSITY_LEVEL; j++)
 		{
 			if (min_diff > diff_arr[j])
 			{
@@ -471,9 +471,9 @@ void CImageToolDoc::OnHistoMatch()
 			}
 		}		
 
-		hist_match_arr[i] = eq_gz[min_idx]; // s_k -> G(z_q)
+		//hist_match_arr[i] = eq_gz[min_idx]; // s_k -> G(z_q)
 		// i : index of s_k, hist_inv_match_arr : z_q corresponding to s_k
-		hist_inv_match_arr[i] = min_idx; // s_k -> G(z_q) -> z_q
+		hist_inv_match_arr[i] = min_idx; // s_k -> z_q
 		memset(diff_arr, 0, sizeof(diff_arr));
 	}	
 	
@@ -481,16 +481,10 @@ void CImageToolDoc::OnHistoMatch()
 	// inverse mapping
 	float new_specified_hist[TOTAL_INTENSITY_LEVEL] = { 0 };
 	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
-	{
-		new_specified_hist[hist_inv_match_arr[i]] += normalized_hist[i];
+	{		
+		new_specified_hist[i] = (int)round(eq_hist[hist_inv_match_arr[i]]);
 	}
-
-	
-	int result_new_hist[TOTAL_INTENSITY_LEVEL] = { 0 };
-	for (int i = 0; i < TOTAL_INTENSITY_LEVEL; i++)
-	{
-		result_new_hist[i] = (int)round(new_specified_hist[i]);
-	}
+		
 
 	// get equalized image
 	for (int j = 0; j < h; j++)
@@ -500,8 +494,8 @@ void CImageToolDoc::OnHistoMatch()
 			for (int k = 0; k < TOTAL_INTENSITY_LEVEL; k++)
 			{
 				if (src_ptr[j][i] == k)
-				{
-					des_ptr[j][i] = eq_hist[hist_inv_match_arr[k]];
+				{					
+					des_ptr[j][i] = new_specified_hist[k];
 				}
 			}
 		}
