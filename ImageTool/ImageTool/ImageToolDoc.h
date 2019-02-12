@@ -72,4 +72,5 @@ public:
 	afx_msg void OnRgbToHsi();
 	afx_msg void OnColorComplement();
 	afx_msg void OnColorSlicing();
+	afx_msg void OnBitPlane();
 };

@@ -55,6 +55,7 @@ BEGIN_MESSAGE_MAP(CImageToolDoc, CDocument)
 	ON_COMMAND(ID_RGB_TO_HSI, &CImageToolDoc::OnRgbToHsi)
 	ON_COMMAND(ID_COLOR_COMPLEMENT, &CImageToolDoc::OnColorComplement)
 	ON_COMMAND(ID_COLOR_SLICING, &CImageToolDoc::OnColorSlicing)
+	ON_COMMAND(ID_BIT_PLANE, &CImageToolDoc::OnBitPlane)
 END_MESSAGE_MAP()
 
 
@@ -2137,5 +2138,32 @@ void CImageToolDoc::OnColorSlicing()
 	else
 	{
 		AfxMessageBox((LPCTSTR)"It's not supported");
+	}
+}
+
+
+void CImageToolDoc::OnBitPlane()
+{
+	// TODO: Add your command handler code here
+	int w = m_Dib.GetWidth();
+	int h = m_Dib.GetHeight();
+
+	CDib src_dib = m_Dib;
+	BYTE **src_ptr = src_dib.GetPtr();
+	CDib dst_dib;
+	dst_dib.CreateGrayImage(w, h);
+	BYTE **dst_ptr = dst_dib.GetPtr();
+
+	for (int k = 0; k < 8; k++)
+	{
+		for (int j = 0; j < h; j++)
+		{
+			for (int i = 0; i < w; i++)
+			{
+				dst_ptr[j][i] = ((src_ptr[j][i] & (1 << k)) >> k) * 255;
+			}
+		}
+
+		AfxNewImage(dst_dib);
 	}
 }
