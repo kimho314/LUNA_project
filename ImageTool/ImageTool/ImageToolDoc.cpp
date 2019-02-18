@@ -56,6 +56,7 @@ BEGIN_MESSAGE_MAP(CImageToolDoc, CDocument)
 	ON_COMMAND(ID_COLOR_COMPLEMENT, &CImageToolDoc::OnColorComplement)
 	ON_COMMAND(ID_COLOR_SLICING, &CImageToolDoc::OnColorSlicing)
 	ON_COMMAND(ID_BIT_PLANE, &CImageToolDoc::OnBitPlane)
+	ON_COMMAND(ID_HIST_EQ_IN_HSI, &CImageToolDoc::OnHistEqInHsi)
 END_MESSAGE_MAP()
 
 
@@ -1659,27 +1660,8 @@ void CImageToolDoc::OnRgbToHsi()
 	// TODO: Add your command handler code here	
 	int w = m_Dib.GetWidth();
 	int h = m_Dib.GetHeight();
-
-	if (m_Dib.GetBitCount() == 8)
-	{
-		CDib dib = m_Dib;
-		BYTE** ptr = dib.GetPtr();
-		CDib dst_dib;
-		dst_dib.CreateGrayImage(w, h, 0);
-		BYTE** dst_ptr = dst_dib.GetPtr();
 		
-		for (int j = 0; j < h; j++)
-		{
-			for (int i = 0; i < w; i++)
-			{				
-				dst_ptr[j][i] = ptr[j][i];
-			}
-		}
-		
-
-		AfxNewImage(dib);
-	}
-	else if (m_Dib.GetBitCount() == 24)
+	if (m_Dib.GetBitCount() == 24)
 	{
 		CDib src_dib = m_Dib;
 		RGBBYTE** src_ptr = src_dib.GetRGBPtr();
@@ -2165,5 +2147,35 @@ void CImageToolDoc::OnBitPlane()
 		}
 
 		AfxNewImage(dst_dib);
+	}
+}
+
+
+void CImageToolDoc::OnHistEqInHsi()
+{
+	// TODO: Add your command handler code here
+	int src_w = m_Dib.GetWidth();
+	int src_h = m_Dib.GetHeight();
+
+	if (m_Dib.GetBitCount() == 24)
+	{
+		CDib src_dib = m_Dib;
+		CDib dst_dib;
+		CDib hue_dib;
+		CDib sat_dib;
+		CDib int_dib;
+		hue_dib.CreateGrayImage(src_w, src_h);
+		sat_dib.CreateGrayImage(src_w, src_h);
+		int_dib.CreateGrayImage(src_w, src_h);
+
+		// convert to RGB to HSI
+		RGBtoHSI(&hue_dib, &sat_dib, &int_dib, &src_dib);
+
+		// histogram equalizing on Intensity component
+
+	}
+	else
+	{
+		printf("it's not supported\n");
 	}
 }
