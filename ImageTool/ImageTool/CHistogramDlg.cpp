@@ -159,3 +159,33 @@ void CHistogramDlg::PrintHistogram(float *histo)
 		m_Histogram[i] = (int)((histo[i] * 100) / max_histo);
 	}
 }
+
+void CHistogramDlg::HistEqualization(CDib *dst, double *histo, CDib *src)
+{
+	BYTE **dst_ptr = dst->GetPtr();
+	BYTE **src_ptr = src->GetPtr();
+	int src_w = src->GetWidth();
+	int src_h = src->GetHeight();
+	int total_pixels = src_w * src_h;
+
+	double cdf[256] = { 0.0 };
+	cdf[0] = histo[0];
+	for (int i = 1; i < 256; i++)
+	{
+		cdf[i] = 255.0 * histo[i] + cdf[i - 1];
+	}
+
+	int round_cdf[256] = { 0 };
+	for (int i = 0; i < 256; i++)
+	{
+		round_cdf[i] = (int)round(cdf[i]);
+	}
+
+	for (int j = 0; j < src_h; j++)
+	{
+		for (int i = 0; i < src_w; i++)
+		{
+			dst_ptr[j][i] = round_cdf[src_ptr[j][i]];
+		}
+	}
+}

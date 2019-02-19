@@ -2161,18 +2161,67 @@ void CImageToolDoc::OnHistEqInHsi()
 	{
 		CDib src_dib = m_Dib;
 		CDib dst_dib;
+		dst_dib.CreateRGBImage(src_w, src_h);
 		CDib hue_dib;
 		CDib sat_dib;
 		CDib int_dib;
 		hue_dib.CreateGrayImage(src_w, src_h);
 		sat_dib.CreateGrayImage(src_w, src_h);
-		int_dib.CreateGrayImage(src_w, src_h);
-
-		// convert to RGB to HSI
+		int_dib.CreateGrayImage(src_w, src_h);		
+							
+	
+		// histogram equalizing on Intensity component
 		RGBtoHSI(&hue_dib, &sat_dib, &int_dib, &src_dib);
 
-		// histogram equalizing on Intensity component
+		CHistogramDlg dlg;
+		dlg.SetImage(&int_dib);
+		dlg.DoModal();
+		
+		double *norm_hist = nullptr;
+		norm_hist = dlg.GetHistogram();
+		
+		dlg.HistEqualization(&int_dib, norm_hist, &int_dib);
+		dlg.SetImage(&int_dib);
+		AfxNewImage(int_dib);
+		dlg.DoModal();
+		
 
+		//HSItoRGB(&dst_dib, &hue_dib, &sat_dib, &int_dib);
+		//AfxNewImage(dst_dib);
+
+		// histogram equalization on saturation component
+		RGBtoHSI(&hue_dib, &sat_dib, &int_dib, &src_dib);
+
+		dlg.SetImage(&sat_dib);
+		dlg.DoModal();
+
+		norm_hist = dlg.GetHistogram();
+
+		dlg.HistEqualization(&sat_dib, norm_hist, &sat_dib);
+		dlg.SetImage(&sat_dib);
+		AfxNewImage(sat_dib);
+		dlg.DoModal();
+		
+
+		//HSItoRGB(&dst_dib, &hue_dib, &sat_dib, &int_dib);
+		//AfxNewImage(dst_dib);
+
+		// histogram equalization on hue component
+		RGBtoHSI(&hue_dib, &sat_dib, &int_dib, &src_dib);
+
+		dlg.SetImage(&hue_dib);
+		dlg.DoModal();
+
+		norm_hist = dlg.GetHistogram();
+
+		dlg.HistEqualization(&hue_dib, norm_hist, &hue_dib);
+		dlg.SetImage(&hue_dib);
+		AfxNewImage(hue_dib);
+		dlg.DoModal();
+		
+
+		//HSItoRGB(&dst_dib, &hue_dib, &sat_dib, &int_dib);
+		//AfxNewImage(dst_dib);		
 	}
 	else
 	{

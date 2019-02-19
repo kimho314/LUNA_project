@@ -30,4 +30,5 @@ public:
 	double* GetHistogram();
 	void UpdateHistogram(int *histo);
 	void PrintHistogram(float *histo);
+	void HistEqualization(CDib *dst, double *histo, CDib *src);
 };
