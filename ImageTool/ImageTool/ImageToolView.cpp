@@ -11,6 +11,7 @@
 
 #include "ImageToolDoc.h"
 #include "ImageToolView.h"
+#include "CColorSeg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -28,6 +29,8 @@ BEGIN_MESSAGE_MAP(CImageToolView, CScrollView)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CImageToolView::OnFilePrintPreview)
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
 END_MESSAGE_MAP()
 
 // CImageToolView 생성/소멸
@@ -35,7 +38,11 @@ END_MESSAGE_MAP()
 CImageToolView::CImageToolView() noexcept
 {
 	// TODO: 여기에 생성 코드를 추가합니다.
-
+	m_mDragFlag = false;
+	m_LeftTopX = 0;
+	m_LeftTopY = 0;
+	m_RightDownX = 0;
+	m_RightDownY = 0;
 }
 
 CImageToolView::~CImageToolView()
@@ -150,3 +157,48 @@ CImageToolDoc* CImageToolView::GetDocument() const // 디버그되지 않은 버
 
 
 // CImageToolView 메시지 처리기
+
+
+void CImageToolView::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+	if (!m_mDragFlag)
+	{
+		m_LeftTopX = point.x;
+		m_LeftTopY = point.y;
+		m_mDragFlag = true;
+	}
+	CScrollView::OnLButtonDown(nFlags, point);
+}
+
+
+void CImageToolView::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+	CImageToolDoc* pDoc = GetDocument();
+	int src_w = pDoc->m_Dib.GetWidth();
+	int src_h = pDoc->m_Dib.GetHeight();
+
+	if (m_mDragFlag)
+	{
+		m_RightDownX = point.x;
+		m_RightDownY = point.y;
+
+		CClientDC dc(this);
+		CBrush brush;
+		brush.CreateStockObject(NULL_BRUSH);
+		CBrush *pOldBrush = dc.SelectObject(&brush);
+
+		printf("left top : (%3d, %3d), right down : (%3d, %3d)\n", m_LeftTopX, m_LeftTopY, m_RightDownX, m_RightDownY);
+
+		dc.Rectangle(m_LeftTopX, m_LeftTopY, m_RightDownX, m_RightDownY);
+		dc.SelectObject(pOldBrush);
+
+		CColorSeg seg_dlg;
+		seg_dlg.SetRectPoints(m_LeftTopX, m_LeftTopY, m_RightDownX, m_RightDownY);
+
+		m_mDragFlag = false;
+	}
+
+	CScrollView::OnLButtonUp(nFlags, point);
+}

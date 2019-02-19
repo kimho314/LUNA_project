@@ -21,6 +21,7 @@
 #include "CGammaTransDlg.h"
 #include "CLogTransDlg.h"
 #include "CConvOp.h"
+#include "CColorSeg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
