@@ -2191,7 +2191,7 @@ void CImageToolDoc::OnHistEqInHsi()
 		
 		dlg.HistEqualization(&int_dib, norm_hist, &int_dib);
 		dlg.SetImage(&int_dib);
-		AfxNewImage(int_dib);
+		//AfxNewImage(int_dib);
 		dlg.DoModal();
 		
 		HSItoRGB(&dst_dib, &hue_dib, &sat_dib, &int_dib);
@@ -2207,7 +2207,7 @@ void CImageToolDoc::OnHistEqInHsi()
 
 		dlg.HistEqualization(&sat_dib, norm_hist, &sat_dib);
 		dlg.SetImage(&sat_dib);
-		AfxNewImage(sat_dib);
+		//AfxNewImage(sat_dib);
 		dlg.DoModal();
 		
 		HSItoRGB(&dst_dib, &hue_dib, &sat_dib, &int_dib);
@@ -2223,7 +2223,7 @@ void CImageToolDoc::OnHistEqInHsi()
 
 		dlg.HistEqualization(&hue_dib, norm_hist, &hue_dib);
 		dlg.SetImage(&hue_dib);
-		AfxNewImage(hue_dib);
+		//AfxNewImage(hue_dib);
 		dlg.DoModal();
 		
 

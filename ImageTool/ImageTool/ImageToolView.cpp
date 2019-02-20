@@ -196,7 +196,7 @@ void CImageToolView::OnLButtonUp(UINT nFlags, CPoint point)
 
 		SetRectPoints(m_LeftTopX, m_LeftTopY, m_RightDownX, m_RightDownY);
 		
-		//m_mDragFlag = false;
+		m_mDragFlag = false;
 	}
 
 	CScrollView::OnLButtonUp(nFlags, point);
