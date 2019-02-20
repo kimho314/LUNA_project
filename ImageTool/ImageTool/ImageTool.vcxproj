@@ -183,7 +183,6 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CColorSeg.h" />
     <ClInclude Include="CConvOp.h" />
     <ClInclude Include="CFileNewDlg.h" />
     <ClInclude Include="CGammaTransDlg.h" />
@@ -207,7 +206,6 @@
     <ClInclude Include="ViewTree.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CColorSeg.cpp" />
     <ClCompile Include="CConvOp.cpp" />
     <ClCompile Include="CFileNewDlg.cpp" />
     <ClCompile Include="CGammaTransDlg.cpp" />

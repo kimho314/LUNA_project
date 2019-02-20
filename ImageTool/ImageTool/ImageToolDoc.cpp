@@ -21,7 +21,6 @@
 #include "CGammaTransDlg.h"
 #include "CLogTransDlg.h"
 #include "CConvOp.h"
-#include "CColorSeg.h"
 #include "ColorSeg.h"
 
 extern int g_lt_x;

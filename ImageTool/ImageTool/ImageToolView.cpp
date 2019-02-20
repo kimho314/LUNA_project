@@ -11,7 +11,6 @@
 
 #include "ImageToolDoc.h"
 #include "ImageToolView.h"
-#include "CColorSeg.h"
 #include "ColorSeg.h"
 
 #ifdef _DEBUG
