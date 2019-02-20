@@ -14,7 +14,7 @@ void SetRectPoints(int left_top_x, int left_top_y, int right_down_x, int right_d
 	g_rd_y = right_down_y;
 }
 
-void GetMean(CDib *src, bounding_box *bb)
+void GetMean(CDib *src, t_bounding_box *bb)
 {
 	int src_w = src->GetWidth();
 	int src_h = src->GetHeight();
@@ -37,7 +37,7 @@ void GetMean(CDib *src, bounding_box *bb)
 	bb->mean_b /= cnt;
 }
 
-void GetDeviation(CDib *src, bounding_box *bb)
+void GetDeviation(CDib *src, t_bounding_box *bb)
 {
 	int src_w = src->GetWidth();
 	int src_h = src->GetHeight();
@@ -60,7 +60,7 @@ void GetDeviation(CDib *src, bounding_box *bb)
 	bb->devia_b = sqrt(bb->devia_b / (double)cnt);
 }
 
-void ImplementColorSegmentation(CDib *dst, CDib *src, bounding_box *bb)
+void ImplementColorSegmentation(CDib *dst, CDib *src, t_bounding_box *bb)
 {
 	int src_w = src->GetWidth();
 	int src_h = src->GetHeight();

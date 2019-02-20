@@ -2249,7 +2249,7 @@ void CImageToolDoc::OnColorSegRgb()
 		CDib dst_dib;
 		dst_dib.CreateRGBImage(src_w, src_h);		
 
-		bounding_box bb;
+		t_bounding_box bb;
 		ImplementColorSegmentation(&dst_dib, &src_dib, &bb);
 		AfxNewImage(dst_dib);
 	}
