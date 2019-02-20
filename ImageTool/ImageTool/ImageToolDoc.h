@@ -61,8 +61,7 @@ public:
 	afx_msg void OnLocalHistEq();
 	afx_msg void OnLocalHistStats();
 	afx_msg void OnGammaTrans();
-	afx_msg void OnLogTrans();
-	afx_msg void OnTest();
+	afx_msg void OnLogTrans();	
 	afx_msg void OnBoxfilter();
 	afx_msg void OnGaussianfilter();
 	afx_msg void OnZeroPadding();
@@ -74,4 +73,7 @@ public:
 	afx_msg void OnColorSlicing();
 	afx_msg void OnBitPlane();
 	afx_msg void OnHistEqInHsi();
+	afx_msg void OnColorSegRgb();
+
+	
 };

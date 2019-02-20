@@ -12,6 +12,7 @@
 #include "ImageToolDoc.h"
 #include "ImageToolView.h"
 #include "CColorSeg.h"
+#include "ColorSeg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -194,10 +195,9 @@ void CImageToolView::OnLButtonUp(UINT nFlags, CPoint point)
 		dc.Rectangle(m_LeftTopX, m_LeftTopY, m_RightDownX, m_RightDownY);
 		dc.SelectObject(pOldBrush);
 
-		CColorSeg seg_dlg;
-		seg_dlg.SetRectPoints(m_LeftTopX, m_LeftTopY, m_RightDownX, m_RightDownY);
-
-		m_mDragFlag = false;
+		SetRectPoints(m_LeftTopX, m_LeftTopY, m_RightDownX, m_RightDownY);
+		
+		//m_mDragFlag = false;
 	}
 
 	CScrollView::OnLButtonUp(nFlags, point);

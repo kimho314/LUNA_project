@@ -191,6 +191,7 @@
     <ClInclude Include="CHistogramDlg.h" />
     <ClInclude Include="ClassView.h" />
     <ClInclude Include="CLogTransDlg.h" />
+    <ClInclude Include="ColorSeg.h" />
     <ClInclude Include="Dib.h" />
     <ClInclude Include="FileView.h" />
     <ClInclude Include="ImageTool.h" />
@@ -214,6 +215,7 @@
     <ClCompile Include="CHistogramDlg.cpp" />
     <ClCompile Include="ClassView.cpp" />
     <ClCompile Include="CLogTransDlg.cpp" />
+    <ClCompile Include="ColorSeg.cpp" />
     <ClCompile Include="Dib.cpp" />
     <ClCompile Include="DibBmp.cpp" />
     <ClCompile Include="FileView.cpp" />

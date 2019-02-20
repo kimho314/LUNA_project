@@ -22,6 +22,14 @@
 #include "CLogTransDlg.h"
 #include "CConvOp.h"
 #include "CColorSeg.h"
+#include "ColorSeg.h"
+
+extern int g_lt_x;
+extern int g_lt_y;
+extern int g_rd_x;
+extern int g_rd_y;
+
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -58,6 +66,7 @@ BEGIN_MESSAGE_MAP(CImageToolDoc, CDocument)
 	ON_COMMAND(ID_COLOR_SLICING, &CImageToolDoc::OnColorSlicing)
 	ON_COMMAND(ID_BIT_PLANE, &CImageToolDoc::OnBitPlane)
 	ON_COMMAND(ID_HIST_EQ_IN_HSI, &CImageToolDoc::OnHistEqInHsi)
+	ON_COMMAND(ID_COLOR_SEG_RGB, &CImageToolDoc::OnColorSegRgb)
 END_MESSAGE_MAP()
 
 
@@ -2186,9 +2195,8 @@ void CImageToolDoc::OnHistEqInHsi()
 		AfxNewImage(int_dib);
 		dlg.DoModal();
 		
-
-		//HSItoRGB(&dst_dib, &hue_dib, &sat_dib, &int_dib);
-		//AfxNewImage(dst_dib);
+		HSItoRGB(&dst_dib, &hue_dib, &sat_dib, &int_dib);
+		AfxNewImage(dst_dib);
 
 		// histogram equalization on saturation component
 		RGBtoHSI(&hue_dib, &sat_dib, &int_dib, &src_dib);
@@ -2203,9 +2211,8 @@ void CImageToolDoc::OnHistEqInHsi()
 		AfxNewImage(sat_dib);
 		dlg.DoModal();
 		
-
-		//HSItoRGB(&dst_dib, &hue_dib, &sat_dib, &int_dib);
-		//AfxNewImage(dst_dib);
+		HSItoRGB(&dst_dib, &hue_dib, &sat_dib, &int_dib);
+		AfxNewImage(dst_dib);
 
 		// histogram equalization on hue component
 		RGBtoHSI(&hue_dib, &sat_dib, &int_dib, &src_dib);
@@ -2221,8 +2228,31 @@ void CImageToolDoc::OnHistEqInHsi()
 		dlg.DoModal();
 		
 
-		//HSItoRGB(&dst_dib, &hue_dib, &sat_dib, &int_dib);
-		//AfxNewImage(dst_dib);		
+		HSItoRGB(&dst_dib, &hue_dib, &sat_dib, &int_dib);
+		AfxNewImage(dst_dib);		
+	}
+	else
+	{
+		printf("it's not supported\n");
+	}
+}
+
+
+void CImageToolDoc::OnColorSegRgb()
+{
+	// TODO: Add your command handler code here
+	int src_w = m_Dib.GetWidth();
+	int src_h = m_Dib.GetHeight();
+
+	if (m_Dib.GetBitCount() == 24)
+	{
+		CDib src_dib = m_Dib;
+		CDib dst_dib;
+		dst_dib.CreateRGBImage(src_w, src_h);		
+
+		bounding_box bb;
+		ImplementColorSegmentation(&dst_dib, &src_dib, &bb);
+		AfxNewImage(dst_dib);
 	}
 	else
 	{
