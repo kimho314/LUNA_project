@@ -192,8 +192,7 @@ void CImageToolView::OnLButtonUp(UINT nFlags, CPoint point)
 		CPen myPen, *pOldPen;
 		myPen.CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
 		pOldPen = dc.SelectObject(&myPen);
-
-		printf("left top : (%3d, %3d), right down : (%3d, %3d)\n", m_LeftTopX, m_LeftTopY, m_RightDownX, m_RightDownY);
+		
 
 		dc.Rectangle(m_LeftTopX, m_LeftTopY, m_RightDownX, m_RightDownY);
 		dc.SelectObject(pOldBrush);
