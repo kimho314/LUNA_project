@@ -66,6 +66,7 @@ BEGIN_MESSAGE_MAP(CImageToolDoc, CDocument)
 	ON_COMMAND(ID_BIT_PLANE, &CImageToolDoc::OnBitPlane)
 	ON_COMMAND(ID_HIST_EQ_IN_HSI, &CImageToolDoc::OnHistEqInHsi)
 	ON_COMMAND(ID_COLOR_SEG_RGB, &CImageToolDoc::OnColorSegRgb)
+	ON_COMMAND(ID_CLOSING_OPENING, &CImageToolDoc::OnClosingOpening)
 END_MESSAGE_MAP()
 
 
@@ -2247,7 +2248,7 @@ void CImageToolDoc::OnColorSegRgb()
 	{
 		CDib src_dib = m_Dib;
 		CDib dst_dib;
-		dst_dib.CreateRGBImage(src_w, src_h);		
+		dst_dib.CreateRGBImage(src_w, src_h, 0);		
 
 		t_bounding_box bb;
 		ImplementColorSegmentation(&dst_dib, &src_dib, &bb);
@@ -2257,4 +2258,119 @@ void CImageToolDoc::OnColorSegRgb()
 	{
 		printf("it's not supported\n");
 	}
+}
+
+
+void erosion(CDib *dst, CDib *src, int **se)
+{
+	int src_w = src->GetWidth();
+	int src_h = src->GetHeight();
+	int se_size = 3;
+	int half_se_size = (se_size - 1) / 2;
+	int dst_w = src_w + (se_size - 1);
+	int dst_h = src_h + (se_size - 1);
+	
+	dst->CreateRGBImage(dst_w, dst_h);
+	RGBBYTE **src_ptr = src->GetRGBPtr();
+	RGBBYTE **dst_ptr = dst->GetRGBPtr();
+
+	
+	
+	for (int j = 0; j < src_h; j++)
+	{
+		for (int i = 0; i < src_w; i++)
+		{
+			dst_ptr[j + half_se_size][i + half_se_size].r = src_ptr[j][i].r;
+			dst_ptr[j + half_se_size][i + half_se_size].g = src_ptr[j][i].g;
+			dst_ptr[j + half_se_size][i + half_se_size].b = src_ptr[j][i].b;
+		}
+	}
+
+	for (int j = half_se_size; j < src_h + half_se_size; j++)
+	{
+		for (int i = half_se_size; i < src_w + half_se_size; i++)
+		{
+			int sum_r = 0;
+			int sum_g = 0;
+			int sum_b = 0;
+
+			for (int s = -half_se_size; s <= half_se_size; s++)
+			{
+				for (int t = -half_se_size; t <= half_se_size; t++)
+				{
+					sum_r += dst_ptr[j - s][i - t].r * se[s + half_se_size][t + half_se_size];
+					sum_g += dst_ptr[j - s][i - t].g * se[s + half_se_size][t + half_se_size];
+					sum_b += dst_ptr[j - s][i - t].b * se[s + half_se_size][t + half_se_size];
+				}
+			}
+
+			if (sum_r == (se_size * se_size))
+			{
+				src_ptr[j - half_se_size][i - half_se_size].r = 255;
+			}
+			else
+			{
+				src_ptr[j - half_se_size][i - half_se_size].r = 0;
+			}
+
+			if (sum_g == (se_size * se_size))
+			{
+				src_ptr[j - half_se_size][i - half_se_size].g = 255;
+			}
+			else
+			{
+				src_ptr[j - half_se_size][i - half_se_size].g = 0;
+			}
+
+			if (sum_b == (se_size * se_size))
+			{
+				src_ptr[j - half_se_size][i - half_se_size].b = 255;
+			}
+			else
+			{
+				src_ptr[j - half_se_size][i - half_se_size].b = 0;
+			}
+		}
+	}
+
+	
+}
+
+void CImageToolDoc::OnClosingOpening()
+{
+	// TODO: Add your command handler code here
+	int src_w = m_Dib.GetWidth();
+	int src_h = m_Dib.GetHeight();
+
+	if (m_Dib.GetBitCount() == 24)
+	{
+		CDib src_dib = m_Dib;
+		CDib dst_dib;				
+
+		int **se = nullptr;
+		se = new int*[3];
+		for (int i = 0; i < 3; i++)
+			se[i] = new int[3];
+		
+		for (int j = 0; j < 3; j++)
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				se[j][i] = 1;
+			}
+		}
+		
+		erosion(&dst_dib, &src_dib, se);
+
+		AfxNewImage(dst_dib);
+
+		for (int i = 0; i < 3; i++)
+			delete(se[i]);
+		delete(se);
+	}
+	else
+	{
+		printf("it's not supported\n");
+	}
+
 }

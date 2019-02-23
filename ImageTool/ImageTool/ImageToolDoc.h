@@ -76,4 +76,5 @@ public:
 	afx_msg void OnColorSegRgb();
 
 	
+	afx_msg void OnClosingOpening();
 };

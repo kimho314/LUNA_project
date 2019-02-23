@@ -145,13 +145,15 @@
 #define ID_HIST_EQ_IN_HSI               32819
 #define ID_6_COLOR32820                 32820
 #define ID_COLOR_SEG_RGB                32821
+#define ID_9_CLOSING                    32822
+#define ID_CLOSING_OPENING              32823
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        325
-#define _APS_NEXT_COMMAND_VALUE         32822
+#define _APS_NEXT_COMMAND_VALUE         32824
 #define _APS_NEXT_CONTROL_VALUE         1006
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
