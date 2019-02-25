@@ -77,4 +77,5 @@ public:
 
 	
 	afx_msg void OnClosingOpening();
+	afx_msg void OnBoundaryExtraction();
 };
