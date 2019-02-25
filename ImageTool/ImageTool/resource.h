@@ -149,13 +149,15 @@
 #define ID_CLOSING_OPENING              32823
 #define ID_9_BOUNDARY                   32824
 #define ID_BOUNDARY_EXTRACTION          32825
+#define ID_9_OPENING                    32826
+#define ID_OPENING_BY_RECON             32827
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        325
-#define _APS_NEXT_COMMAND_VALUE         32826
+#define _APS_NEXT_COMMAND_VALUE         32828
 #define _APS_NEXT_CONTROL_VALUE         1006
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

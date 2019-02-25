@@ -68,6 +68,7 @@ BEGIN_MESSAGE_MAP(CImageToolDoc, CDocument)
 	ON_COMMAND(ID_COLOR_SEG_RGB, &CImageToolDoc::OnColorSegRgb)
 	ON_COMMAND(ID_CLOSING_OPENING, &CImageToolDoc::OnClosingOpening)
 	ON_COMMAND(ID_BOUNDARY_EXTRACTION, &CImageToolDoc::OnBoundaryExtraction)
+	ON_COMMAND(ID_OPENING_BY_RECON, &CImageToolDoc::OnOpeningByRecon)
 END_MESSAGE_MAP()
 
 
@@ -2263,7 +2264,6 @@ void CImageToolDoc::OnColorSegRgb()
 
 void init_arr(int **arr, int w, int h)
 {	
-
 	for (int j = 0; j < h; j++)
 	{
 		for (int i = 0; i < w; i++)
@@ -2275,13 +2275,15 @@ void init_arr(int **arr, int w, int h)
 
 
 
-void erosion(CDib *dst, CDib *src, int **se, int se_size)
+void erosion(CDib *dst, CDib *src, int **se, int se_w, int se_h)
 {
 	int src_w = src->GetWidth();
 	int src_h = src->GetHeight();	
-	int half_se_size = (se_size - 1) / 2;
-	int dst_w = src_w + (se_size - 1);
-	int dst_h = src_h + (se_size - 1);
+	int a = (se_h - 1) / 2;
+	int b = (se_w - 1) / 2;
+	int dst_w = src_w + (b * 2);
+	int dst_h = src_h + (a * 2);
+	
 	
 	RGBBYTE **src_ptr = src->GetRGBPtr();
 	RGBBYTE **dst_ptr = dst->GetRGBPtr();
@@ -2307,66 +2309,66 @@ void erosion(CDib *dst, CDib *src, int **se, int se_size)
 	{
 		for (int i = 0; i < src_w; i++)
 		{
-			tmp_r[j + half_se_size][i + half_se_size] = src_ptr[j][i].r / 255;
-			tmp_g[j + half_se_size][i + half_se_size] = src_ptr[j][i].g / 255;
-			tmp_b[j + half_se_size][i + half_se_size] = src_ptr[j][i].b / 255;
+			tmp_r[j + a][i + b] = src_ptr[j][i].r / 255;
+			tmp_g[j + a][i + b] = src_ptr[j][i].g / 255;
+			tmp_b[j + a][i + b] = src_ptr[j][i].b / 255;
 		}
 	}	
 	
 
 	// operate erosion
-	for (int j = half_se_size; j < src_h + half_se_size; j++)
+	for (int j = a; j < src_h + a; j++)
 	{
-		for (int i = half_se_size; i < src_w + half_se_size; i++)
+		for (int i = b; i < src_w + b; i++)
 		{
 			int cnt_r = 0;
 			int cnt_g = 0;
 			int cnt_b = 0;
 
-			for (int s = -half_se_size; s <= half_se_size; s++)
+			for (int s = -a; s <= a; s++)
 			{
-				for (int t = -half_se_size; t <= half_se_size; t++)
+				for (int t = -b; t <= b; t++)
 				{
-					if (tmp_r[j - s][i - t] == se[s + half_se_size][t + half_se_size])
+					if (tmp_r[j - s][i - t] == se[s + a][t + b])
 					{
 						cnt_r++;
 					}
-					if (tmp_g[j - s][i - t] == se[s + half_se_size][t + half_se_size])
+					if (tmp_g[j - s][i - t] == se[s + a][t + b])
 					{
 						cnt_g++;
 					}
-					if (tmp_b[j - s][i - t] == se[s + half_se_size][t + half_se_size])
+					if (tmp_b[j - s][i - t] == se[s + a][t + b])
 					{
 						cnt_b++;
 					}
 				}
 			}
 
-			if (cnt_r == (se_size * se_size))
+			if (cnt_r == (se_h * se_w))
 			{
-				dst_ptr[j - half_se_size][i - half_se_size].r = 255;
+				dst_ptr[j - a][i - b].r = 255;
 			}
 			else
 			{
-				dst_ptr[j - half_se_size][i - half_se_size].r = 0;
+				dst_ptr[j - a][i - b].r = 0;
 			}
 
-			if (cnt_g == (se_size * se_size))
+			if (cnt_g == (se_h * se_w))
 			{
-				dst_ptr[j - half_se_size][i - half_se_size].g = 255;
+				dst_ptr[j - a][i - b].g = 255;
 			}
 			else
 			{
-				dst_ptr[j - half_se_size][i - half_se_size].g = 0;
+				dst_ptr[j - a][i - b].g = 0;
 			}
 
-			if (cnt_b == (se_size * se_size))
+			if (cnt_b == (se_h * se_w))
 			{
-				dst_ptr[j - half_se_size][i - half_se_size].b = 255;
+				dst_ptr[j - a][i - b].b = 255;
 			}
 			else
 			{
-				dst_ptr[j - half_se_size][i - half_se_size].b = 0;
+				dst_ptr[j - a][i - b].b = 0;
 			}
 		
 		}
@@ -2385,13 +2387,14 @@ void erosion(CDib *dst, CDib *src, int **se, int se_size)
 	delete(tmp_b);
 }
 
-void dilation(CDib *dst, CDib *src, int **se, int se_size)
+void dilation(CDib *dst, CDib *src, int **se, int se_w, int se_h)
 {
 	int src_w = src->GetWidth();
 	int src_h = src->GetHeight();
-	int half_se_size = (se_size - 1) / 2;
-	int dst_w = src_w + (se_size - 1);
-	int dst_h = src_h + (se_size - 1);
+	int a = (se_h - 1) / 2;
+	int b = (se_w - 1) / 2;
+	int dst_w = src_w + (b * 2);
+	int dst_h = src_h + (a * 2);
 
 	RGBBYTE **src_ptr = src->GetRGBPtr();
 	RGBBYTE **dst_ptr = dst->GetRGBPtr();
@@ -2417,35 +2420,35 @@ void dilation(CDib *dst, CDib *src, int **se, int se_size)
 	{
 		for (int i = 0; i < src_w; i++)
 		{
-			tmp_r[j + half_se_size][i + half_se_size] = src_ptr[j][i].r / 255;
-			tmp_g[j + half_se_size][i + half_se_size] = src_ptr[j][i].g / 255;
-			tmp_b[j + half_se_size][i + half_se_size] = src_ptr[j][i].b / 255;
+			tmp_r[j + a][i + b] = src_ptr[j][i].r / 255;
+			tmp_g[j + a][i + b] = src_ptr[j][i].g / 255;
+			tmp_b[j + a][i + b] = src_ptr[j][i].b / 255;
 		}
 	}
 
 
 	// operate dilation
-	for (int j = half_se_size; j < src_h + half_se_size; j++)
+	for (int j = a; j < src_h + a; j++)
 	{
-		for (int i = half_se_size; i < src_w + half_se_size; i++)
+		for (int i = b; i < src_w + b; i++)
 		{
 			int cnt_r = 0;
 			int cnt_g = 0;
 			int cnt_b = 0;
 
-			for (int s = -half_se_size; s <= half_se_size; s++)
+			for (int s = -a; s <= a; s++)
 			{
-				for (int t = -half_se_size; t <= half_se_size; t++)
+				for (int t = -b; t <= b; t++)
 				{
-					if (tmp_r[j - s][i - t] == se[s + half_se_size][t + half_se_size])
+					if (tmp_r[j - s][i - t] == se[s + a][t + b])
 					{
 						cnt_r++;
 					}
-					if (tmp_g[j - s][i - t] == se[s + half_se_size][t + half_se_size])
+					if (tmp_g[j - s][i - t] == se[s + a][t + b])
 					{
 						cnt_g++;
 					}
-					if (tmp_b[j - s][i - t] == se[s + half_se_size][t + half_se_size])
+					if (tmp_b[j - s][i - t] == se[s + a][t + b])
 					{
 						cnt_b++;
 					}
@@ -2454,29 +2457,29 @@ void dilation(CDib *dst, CDib *src, int **se, int se_size)
 
 			if (cnt_r >= 1)
 			{
-				dst_ptr[j - half_se_size][i - half_se_size].r = 255;
+				dst_ptr[j - a][i - b].r = 255;
 			}
 			else
 			{
-				dst_ptr[j - half_se_size][i - half_se_size].r = 0;
+				dst_ptr[j - a][i - b].r = 0;
 			}
 
 			if (cnt_g >= 1)
 			{
-				dst_ptr[j - half_se_size][i - half_se_size].g = 255;
+				dst_ptr[j - a][i - b].g = 255;
 			}
 			else
 			{
-				dst_ptr[j - half_se_size][i - half_se_size].g = 0;
+				dst_ptr[j - a][i - b].g = 0;
 			}
 
 			if (cnt_b >= 1)
 			{
-				dst_ptr[j - half_se_size][i - half_se_size].b = 255;
+				dst_ptr[j - a][i - b].b = 255;
 			}
 			else
 			{
-				dst_ptr[j - half_se_size][i - half_se_size].b = 0;
+				dst_ptr[j - a][i - b].b = 0;
 			}
 
 		}
@@ -2521,13 +2524,13 @@ void CImageToolDoc::OnClosingOpening()
 			}
 		}
 		
-		erosion(&dst_dib, &src_dib, se, 3);
+		erosion(&dst_dib, &src_dib, se, 3, 3);
 		AfxNewImage(dst_dib);
-		dilation(&dst_dib, &dst_dib, se, 3);
+		dilation(&dst_dib, &dst_dib, se, 3, 3);
 		AfxNewImage(dst_dib);
-		dilation(&dst_dib, &dst_dib, se, 3);
+		dilation(&dst_dib, &dst_dib, se, 3, 3);
 		AfxNewImage(dst_dib);
-		erosion(&dst_dib, &dst_dib, se, 3);
+		erosion(&dst_dib, &dst_dib, se, 3, 3);
 		AfxNewImage(dst_dib);
 
 		for (int i = 0; i < 3; i++)
@@ -2583,9 +2586,48 @@ void CImageToolDoc::OnBoundaryExtraction()
 			}
 		}
 
-		erosion(&dst_dib, &src_dib, se, 3);
+		erosion(&dst_dib, &src_dib, se, 3, 3);
 		AfxNewImage(dst_dib);
 		get_diff_img(&dst_dib, &src_dib);
+		AfxNewImage(dst_dib);
+
+		for (int i = 0; i < 3; i++)
+			delete(se[i]);
+		delete(se);
+	}
+	else
+	{
+		printf("it's not supported\n");
+	}
+}
+
+
+void CImageToolDoc::OnOpeningByRecon()
+{
+	// TODO: Add your command handler code here
+	int src_w = m_Dib.GetWidth();
+	int src_h = m_Dib.GetHeight();
+
+	if (m_Dib.GetBitCount() == 24)
+	{
+		CDib src_dib = m_Dib;
+		CDib dst_dib;
+		dst_dib.CreateRGBImage(src_w, src_h);
+
+		int **se = nullptr;
+		se = new int*[51];
+		for (int i = 0; i < 51; i++)
+			se[i] = new int[1];
+
+		for (int j = 0; j < 51; j++)
+		{
+			for (int i = 0; i < 1; i++)
+			{
+				se[j][i] = 1;
+			}
+		}
+
+		erosion(&dst_dib, &src_dib, se, 1, 51);
 		AfxNewImage(dst_dib);
 
 		for (int i = 0; i < 3; i++)
