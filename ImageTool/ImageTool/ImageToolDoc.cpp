@@ -2623,6 +2623,54 @@ void CImageToolDoc::OnBoundaryExtraction()
 	}
 }
 
+int determine_terminate(CDib *dst, CDib *src)
+{
+	int w = src->GetWidth();
+	int h = src->GetHeight();
+	int is_same = 0;
+	RGBBYTE **src_ptr = src->GetRGBPtr();
+	RGBBYTE **dst_ptr = dst->GetRGBPtr();
+
+	for (int j = 0; j < h; j++)
+	{
+		for (int i = 0; i < w; i++)
+		{
+			if (src_ptr[j][i].r == dst_ptr[j][i].r)
+			{
+				is_same++;
+			}
+			else
+			{
+				is_same--;
+			}
+			if (src_ptr[j][i].g == dst_ptr[j][i].b)
+			{
+				is_same++;
+			}
+			else
+			{
+				is_same--;
+			}
+			if (src_ptr[j][i].b == dst_ptr[j][i].b)
+			{
+				is_same++;
+			}
+			else
+			{
+				is_same--;
+			}
+		}
+	}
+
+	if (is_same == (w*h) * 3)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
 
 void CImageToolDoc::OnOpeningByRecon()
 {
@@ -2635,6 +2683,9 @@ void CImageToolDoc::OnOpeningByRecon()
 		CDib src_dib = m_Dib;
 		CDib dst_dib;
 		dst_dib.CreateRGBImage(src_w, src_h);
+		RGBBYTE **src_ptr = src_dib.GetRGBPtr();
+		RGBBYTE **dst_ptr = dst_dib.GetRGBPtr();
+
 
 		int **se = nullptr;
 		se = new int*[51];
@@ -2650,10 +2701,10 @@ void CImageToolDoc::OnOpeningByRecon()
 		}
 
 		erosion(&dst_dib, &src_dib, se, 1, 51);
-		AfxNewImage(dst_dib);		
+		//AfxNewImage(dst_dib);		
 		
 		opening(&dst_dib, &src_dib, se, 1, 51);
-		AfxNewImage(dst_dib);
+		//AfxNewImage(dst_dib);
 
 		int **se2 = nullptr;
 		se2 = new int*[3];
@@ -2668,9 +2719,44 @@ void CImageToolDoc::OnOpeningByRecon()
 			}
 		}
 		
+		// opening by reconstruction
 		erosion(&dst_dib, &src_dib, se, 1, 51);
-		AfxNewImage(dst_dib);
+		//AfxNewImage(dst_dib);
+		
+		int terminate_flag = 0;
+		while(1)
+		{
+			CDib prev_dib;
+			prev_dib.CreateRGBImage(src_w, src_h, 0);
+			prev_dib.Copy(&dst_dib);
 
+			dilation(&dst_dib, &dst_dib, se2, 3, 3);
+			
+			// masking
+			for (int j = 0; j < src_h; j++)
+			{
+				for (int i = 0; i < src_w; i++)
+				{
+					dst_ptr[j][i].r = ((dst_ptr[j][i].r / 255) & (src_ptr[j][i].r / 255)) * 255;
+					dst_ptr[j][i].g = ((dst_ptr[j][i].g / 255) & (src_ptr[j][i].g / 255)) * 255;
+					dst_ptr[j][i].b = ((dst_ptr[j][i].b / 255) & (src_ptr[j][i].b / 255)) * 255;
+				}
+			}
+
+			terminate_flag = determine_terminate(&dst_dib, &prev_dib);
+			
+
+			if (terminate_flag)
+			{
+				terminate_flag = 0;
+				break;
+			}
+			else
+			{
+				continue;
+			}
+		}
+		AfxNewImage(dst_dib);
 
 		for (int i = 0; i < 51; i++)
 			delete(se[i]);
