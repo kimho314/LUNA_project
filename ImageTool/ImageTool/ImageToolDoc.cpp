@@ -2701,10 +2701,10 @@ void CImageToolDoc::OnOpeningByRecon()
 		}
 
 		erosion(&dst_dib, &src_dib, se, 1, 51);
-		//AfxNewImage(dst_dib);		
+		AfxNewImage(dst_dib);		
 		
 		opening(&dst_dib, &src_dib, se, 1, 51);
-		//AfxNewImage(dst_dib);
+		AfxNewImage(dst_dib);
 
 		int **se2 = nullptr;
 		se2 = new int*[3];
@@ -2720,8 +2720,7 @@ void CImageToolDoc::OnOpeningByRecon()
 		}
 		
 		// opening by reconstruction
-		erosion(&dst_dib, &src_dib, se, 1, 51);
-		//AfxNewImage(dst_dib);
+		erosion(&dst_dib, &src_dib, se, 1, 51);		
 		
 		int terminate_flag = 0;
 		while(1)
