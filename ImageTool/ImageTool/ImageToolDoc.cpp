@@ -2655,11 +2655,30 @@ void CImageToolDoc::OnOpeningByRecon()
 		opening(&dst_dib, &src_dib, se, 1, 51);
 		AfxNewImage(dst_dib);
 
-
-
+		int **se2 = nullptr;
+		se2 = new int*[3];
 		for (int i = 0; i < 3; i++)
+			se2[i] = new int[3];
+
+		for (int j = 0; j < 3; j++)
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				se2[j][i] = 1;
+			}
+		}
+		
+		erosion(&dst_dib, &src_dib, se, 1, 51);
+		AfxNewImage(dst_dib);
+
+
+		for (int i = 0; i < 51; i++)
 			delete(se[i]);
 		delete(se);
+
+		for (int i = 0; i < 3; i++)
+			delete(se2[i]);
+		delete(se2);
 	}
 	else
 	{
