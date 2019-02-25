@@ -2499,20 +2499,32 @@ void dilation(CDib *dst, CDib *src, int **se, int se_w, int se_h)
 	delete(tmp_b);
 }
 
-void opening(CDib *dst, CDib *src, int **se)
+void opening(CDib *dst, CDib *src, int **se, int se_w, int se_h, int imshow_op = 0)
 {
-	erosion(dst, src, se, 3, 3);
-	AfxNewImage(*dst);
-	dilation(dst, dst, se, 3, 3);
-	AfxNewImage(*dst);
+	erosion(dst, src, se, se_w, se_h);
+	if (imshow_op)
+	{
+		AfxNewImage(*dst);
+	}
+	dilation(dst, dst, se, se_w, se_h);
+	if (imshow_op)
+	{
+		AfxNewImage(*dst);
+	}
 }
 
-void closing(CDib *dst, CDib *src, int **se)
+void closing(CDib *dst, CDib *src, int **se, int se_w, int se_h, int imshow_op = 0)
 {
-	dilation(dst, dst, se, 3, 3);
-	AfxNewImage(*dst);
-	erosion(dst, dst, se, 3, 3);
-	AfxNewImage(*dst);
+	dilation(dst, dst, se, se_w, se_h);
+	if (imshow_op)
+	{
+		AfxNewImage(*dst);
+	}
+	erosion(dst, dst, se, se_w, se_h);
+	if (imshow_op)
+	{
+		AfxNewImage(*dst);
+	}
 }
 
 void CImageToolDoc::OnClosingOpening()
@@ -2540,8 +2552,8 @@ void CImageToolDoc::OnClosingOpening()
 			}
 		}
 		
-		opening(&dst_dib, &src_dib, se);		
-		closing(&dst_dib, &dst_dib, se);
+		opening(&dst_dib, &src_dib, se, 3, 3, 1);		
+		closing(&dst_dib, &dst_dib, se, 3, 3, 1);
 
 		for (int i = 0; i < 3; i++)
 			delete(se[i]);
@@ -2638,7 +2650,12 @@ void CImageToolDoc::OnOpeningByRecon()
 		}
 
 		erosion(&dst_dib, &src_dib, se, 1, 51);
+		AfxNewImage(dst_dib);		
+		
+		opening(&dst_dib, &src_dib, se, 1, 51);
 		AfxNewImage(dst_dib);
+
+
 
 		for (int i = 0; i < 3; i++)
 			delete(se[i]);
