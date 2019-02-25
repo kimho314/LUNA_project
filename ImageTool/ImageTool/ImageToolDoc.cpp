@@ -2499,6 +2499,22 @@ void dilation(CDib *dst, CDib *src, int **se, int se_w, int se_h)
 	delete(tmp_b);
 }
 
+void opening(CDib *dst, CDib *src, int **se)
+{
+	erosion(dst, src, se, 3, 3);
+	AfxNewImage(*dst);
+	dilation(dst, dst, se, 3, 3);
+	AfxNewImage(*dst);
+}
+
+void closing(CDib *dst, CDib *src, int **se)
+{
+	dilation(dst, dst, se, 3, 3);
+	AfxNewImage(*dst);
+	erosion(dst, dst, se, 3, 3);
+	AfxNewImage(*dst);
+}
+
 void CImageToolDoc::OnClosingOpening()
 {
 	// TODO: Add your command handler code here
@@ -2524,14 +2540,8 @@ void CImageToolDoc::OnClosingOpening()
 			}
 		}
 		
-		erosion(&dst_dib, &src_dib, se, 3, 3);
-		AfxNewImage(dst_dib);
-		dilation(&dst_dib, &dst_dib, se, 3, 3);
-		AfxNewImage(dst_dib);
-		dilation(&dst_dib, &dst_dib, se, 3, 3);
-		AfxNewImage(dst_dib);
-		erosion(&dst_dib, &dst_dib, se, 3, 3);
-		AfxNewImage(dst_dib);
+		opening(&dst_dib, &src_dib, se);		
+		closing(&dst_dib, &dst_dib, se);
 
 		for (int i = 0; i < 3; i++)
 			delete(se[i]);
