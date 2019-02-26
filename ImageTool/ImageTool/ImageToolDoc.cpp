@@ -2404,11 +2404,13 @@ void dilation(CDib *dst, CDib *src, int **se, int se_w, int se_h)
 	for (int i = 0; i < dst_h; i++)
 		tmp_r[i] = new int[dst_w];
 	init_arr(tmp_r, dst_w, dst_h);
+
 	int **tmp_g = nullptr;
 	tmp_g = new int*[dst_h];
 	for (int i = 0; i < dst_h; i++)
 		tmp_g[i] = new int[dst_w];
 	init_arr(tmp_g, dst_w, dst_h);
+
 	int **tmp_b = nullptr;
 	tmp_b = new int*[dst_h];
 	for (int i = 0; i < dst_h; i++)
@@ -2623,7 +2625,7 @@ void CImageToolDoc::OnBoundaryExtraction()
 	}
 }
 
-int determine_terminate(CDib *dst, CDib *src)
+int determine_termination(CDib *dst, CDib *src)
 {
 	int w = src->GetWidth();
 	int h = src->GetHeight();
@@ -2643,6 +2645,7 @@ int determine_terminate(CDib *dst, CDib *src)
 			{
 				is_same--;
 			}
+
 			if (src_ptr[j][i].g == dst_ptr[j][i].b)
 			{
 				is_same++;
@@ -2651,6 +2654,7 @@ int determine_terminate(CDib *dst, CDib *src)
 			{
 				is_same--;
 			}
+
 			if (src_ptr[j][i].b == dst_ptr[j][i].b)
 			{
 				is_same++;
@@ -2720,15 +2724,18 @@ void CImageToolDoc::OnOpeningByRecon()
 		}
 		
 		// opening by reconstruction
+		// get marker; the image eroded by 51x1 forground se
 		erosion(&dst_dib, &src_dib, se, 1, 51);		
 		
 		int terminate_flag = 0;
+		CDib prev_dib;
+		prev_dib.CreateRGBImage(src_w, src_h, 0);
+
 		while(1)
-		{
-			CDib prev_dib;
-			prev_dib.CreateRGBImage(src_w, src_h, 0);
+		{			
 			prev_dib.Copy(&dst_dib);
 
+			// operate dilation
 			dilation(&dst_dib, &dst_dib, se2, 3, 3);
 			
 			// masking
@@ -2742,8 +2749,8 @@ void CImageToolDoc::OnOpeningByRecon()
 				}
 			}
 
-			terminate_flag = determine_terminate(&dst_dib, &prev_dib);
-			
+			// check if D_(k) == D_(k-1)
+			terminate_flag = determine_termination(&dst_dib, &prev_dib);			
 
 			if (terminate_flag)
 			{
