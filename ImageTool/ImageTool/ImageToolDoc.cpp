@@ -2387,6 +2387,48 @@ void erosion(CDib *dst, CDib *src, int **se, int se_w, int se_h)
 	delete(tmp_b);
 }
 
+void reflection(int **se, int se_w, int se_h)
+{
+	int new_se_w = se_h;
+	int new_se_h = se_w;
+
+	int **tmp_se = NULL;
+	tmp_se = (int**)malloc(sizeof(int*) * new_se_h);
+	for (int i = 0; i < new_se_h; i++)
+	{
+		tmp_se[i] = (int*)malloc(sizeof(int) * new_se_w);
+	}
+	init_arr(tmp_se, new_se_w, new_se_h);
+
+	for (int j = 0; j < se_h; j++)
+	{
+		for (int i = 0; i < se_w; i++)
+		{
+			tmp_se[i][j] = se[j][i];
+		}
+	}	
+
+	se = (int**)malloc(sizeof(int*) * new_se_h);
+	for (int i = 0; i < new_se_h; i++)
+	{
+		se[i] = (int*)malloc(sizeof(int) * new_se_w); 
+	}
+
+	for (int j = 0; j < new_se_h; j++)
+	{
+		for (int i = 0; i < new_se_w; i++)
+		{
+			se[j][i] = tmp_se[j][i];
+		}
+	}
+
+	for (int i = 0; i < new_se_h; i++)
+	{
+		free(tmp_se[i]);
+	}
+	free(tmp_se);	
+}
+
 void dilation(CDib *dst, CDib *src, int **se, int se_w, int se_h)
 {
 	int src_w = src->GetWidth();
@@ -2416,6 +2458,9 @@ void dilation(CDib *dst, CDib *src, int **se, int se_w, int se_h)
 	for (int i = 0; i < dst_h; i++)
 		tmp_b[i] = new int[dst_w];
 	init_arr(tmp_b, dst_w, dst_h);
+
+	reflection(se, se_w, se_h);
+	
 
 	// scaling image value [0,1]
 	for (int j = 0; j < src_h; j++)
@@ -2730,7 +2775,7 @@ void CImageToolDoc::OnOpeningByRecon()
 		int terminate_flag = 0;
 		CDib prev_dib;
 		prev_dib.CreateRGBImage(src_w, src_h, 0);
-
+		
 		while(1)
 		{			
 			prev_dib.Copy(&dst_dib);
@@ -2751,9 +2796,9 @@ void CImageToolDoc::OnOpeningByRecon()
 
 			// check if D_(k) == D_(k-1)
 			terminate_flag = determine_termination(&dst_dib, &prev_dib);			
-
+			
 			if (terminate_flag)
-			{
+			{				
 				terminate_flag = 0;
 				break;
 			}
