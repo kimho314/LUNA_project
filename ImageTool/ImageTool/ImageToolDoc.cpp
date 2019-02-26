@@ -2646,7 +2646,7 @@ int determine_termination(CDib *dst, CDib *src)
 				is_same--;
 			}
 
-			if (src_ptr[j][i].g == dst_ptr[j][i].b)
+			if (src_ptr[j][i].g == dst_ptr[j][i].g)
 			{
 				is_same++;
 			}
