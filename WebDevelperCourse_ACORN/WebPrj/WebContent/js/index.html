@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang>
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<title>Document</title>
+
+	<script>
+		// var x = new Number(3);
+		// var y = 4;
+		// alert(x + y);
+		// var x;
+		// alert(x == undefined);
+
+		// var name = "홍길동";
+		// var name1 = '홍길동';
+
+		// 1. 배열 인덱스로 사용하는 일반적인 배열처럼 사용
+		// 2. 조작을 혼자서 스스로 해주는 기능 : splice()
+		// 3. 스텍이라는 자료구조를 내포하고 있다. : pop()
+
+		// 배열에 값을 삽입/추가(x)
+		//var nums = new Array();
+		var nums = [];
+		// nums[0] = 1;
+		// nums[1] = 2;
+		// nums[3] = 4;
+		nums.push(1);
+		nums.push(2);
+		nums.push(3);
+
+		//nums.splice(1,2,9,3); // 배열 관리할 때 유용한 메소드
+
+		var lastOne = nums.pop();
+
+		for (var i = 0; i < nums.length; i++) {
+			console.log(nums[i]);
+		}
+
+		var els = "<input type=\"submit\" value=\"click\">";
+
+		var nums2 = new Array(5, 1);
+
+		for (var i = 0; i < nums.length; i++) {
+			console.log(nums2[i]);
+		}
+
+		//var exam = new Object();
+		// var exam = {};
+		// exam.kor = 30;
+		// exam.eng = 70;
+		// exam.math = 80;
+
+		// console.log(exam);
+
+		// console.log(typeof 3);
+		// console.log(typeof exam);
+
+		var exam = {
+			"kor": 10,
+			"eng": 30
+		};
+		//var exam = {kor:10, eng:30};
+		console.log(exam);
+
+		// var notice = [
+		//   {"id":1, "title":"hello jason"},
+		//   {"id":2, "title":"hi json"},
+		//   {"id":3, "title":"json is"}
+		// ]
+		// console.log(notice);
+
+		// var data = JSON.parse('[{"id":1, "title":"hello"},{"id":2, "title":"hi"}]');
+		// console.log(data[0].title);
+
+		// var x = 30;
+		// var y = 50;
+		// var exam = {"kor":x, "eng":y};
+		// var json = JSON.stringify(exam);
+
+		// console.log(json);
+
+		// eval("var x = 3;");
+		// console.log(x);
+
+		// var str = "hello";
+		// var str1 = "hello";
+
+		// console.log(str === str1);
+		// console.log(3+"4");
+
+		// var ar = ["철수","영희","영구","맹구","영철","훈이"];
+
+		// for(var i in ar)
+		// {
+		//   console.log(ar[i]);
+		// }
+
+		var exam = {
+			kor: 10,
+			eng: 20,
+			math: 20
+		};
+		for (var k in exam) {
+			console.log(k + ":" + exam[k]);
+
+		}
+
+		// var add = new Function("x,y", "return x+y");
+		// console.log(add(3,4));
+
+		// var add = function(x,y){return x+y;}
+		// console.log(add(3,4,5,6));
+
+		var add = function () {
+			arguments.length;
+			return arguments[0] + arguments[1];
+		}
+		console.log("add : " + add(3, 4));
+
+		var sum = function () {
+			var ret = 0;
+			for (var i = 0; i < arguments.length; i++) {
+				ret += arguments[i];
+			}
+			return ret;
+		}
+		console.log("sum : " + sum(1, 2, 3, 4, 10, 20, 30));
+
+		// var a = 1; 
+		// console.log(window.a);
+
+		//   var f1 = function()
+		//   {
+		//     a = 1;
+		//     var a;
+		//     a++;
+		//     console.log(a);
+		//     console.log(window.a);
+		//     return a;
+		//   }
+		//  f1();
+
+		// var a = 1;
+		// var a = 2;
+		// console.log(a);
+
+		// {
+		//   var a = 1;
+		// }
+		// console.log(a);
+
+		// function f1(){
+		//   a = 1;
+		// }
+
+		// f1();
+
+		// function f1(){
+		//   var a = 1;
+		//   f2();
+		//   function f2(){
+		//     var a = 2;
+		//     f3();
+		//     function f3(){
+		//      a = 3;
+		//     }
+		//   }
+
+		//   console.log(a);
+		// }
+		// f1();
+
+		// var ar = [1, "hello", function(){return 3;}];
+
+		// var print = function(comparer)
+		// {
+		//   if(comparer(5,3) == true)
+		//   {
+		//     console.log("Hello World!");
+		//   }
+		// }
+
+		// var c = function(x,y){return x>y;};
+		// print(c);
+
+		// var x,y;
+		// x = prompt("x 값을 입력하세요",0);
+		// y = prompt("y 값을 입력하세요",0);
+
+		// x = parseInt(x);
+		// y = parseInt(y);
+		// if(isNaN(x) || isNaN(y))
+		// {
+		//   alert("NaN Erroe!!!");
+		// }
+
+		// alert(x+y);
+
+		// var width = parseInt("120px");
+		// width += 2;
+		// alert(width);
+
+		// var answer;
+		// answer = confirm("정말로 삭제하시겠습니까?");
+		// if(answer)
+		// {
+		//   alert("삭제 되었습니다");
+		// }
+
+		var html = "<h1>안녕하세요</h1>";
+		document.write(html);
+
+		// function printAlert()
+		// {
+		//   alert("안내 메시지 입니다");
+		// }  
+
+		// function printResult()
+		// {
+		//   var x,y;
+		//   x = parseInt(prompt("input x value"));
+		//   y = parseInt(prompt("input y value"));
+		//   var btnPrint = document.getElementById("btn-print");
+		//   btnPrint.value = x+y;
+		// }      
+	</script>
+	<script src="index.js"></script>
+	<script src="test.js"></script>
+</head>
+
+<body>
+	<!-- <input type="button" value="출력" onclick="printAlert()" /> -->
+	<input type="button" value="출력" id="btn-print" />
+	<input type="button" value="click2" id="btn-print2" />
+</body>
+
+</html>

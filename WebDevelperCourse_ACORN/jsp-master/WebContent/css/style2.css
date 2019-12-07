@@ -1,0 +1,49 @@
+@import url(layout2.css);
+
+
+.d-none{
+    display: none;
+}
+
+/* 콘텐츠를 수납하는 가구를 꾸미는 곳 */
+
+body{
+	
+	list-style: decimal;
+
+	font-family: 돋움, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #979797;
+}
+
+/* --- header -------------------------------------- */
+#logo{
+    display: inline-block;
+    width:182px;
+    height: 35px;
+    background: url(../images/logo.png) no-repeat left top;
+    text-indent: -999px;
+    overflow: hidden;
+}
+
+#main-menu{
+
+}
+
+    #main-menu>ul{
+        display: flex;
+
+        font-family: "맑은 고딕", 고딕, Arial, Helvetica, sans-serif;
+        font-size: 15px;
+        font-weight: bold;
+        color:#000;
+    }
+
+        #main-menu>ul>li{
+            padding-left: 24px;
+            background: url(../images/bg-main-menu-vsp.png) no-repeat 12px center;
+        }
+
+            #main-menu a:hover{
+                color:#ff6a00;
+            }

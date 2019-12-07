@@ -1,0 +1,238 @@
+<!-- 
+블록의 종류
+
+1. 콘텐츠를 가지고 있는 블록 : 5가지 종류 + 기타(section)
+2. 상위 블록 : 방 > 레이아웃(배치하기)을 위한 방
+3. 인라인 블록 : 콘텐츠 안에서 영역을 가지는 공간
+
+위에서 1(옵션), 2(필수)번은 제목 필요. 3번은 없음.
+
+
+-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>뉴렉처 아님</title>
+    <!-- 
+	# = ID, . = 클래스 그냥은 태그
+
+	nav .제목3 { : nav 태그 안에있는 제목3 전부 적용됨
+	nav > .제목3 { nav 태그 안에있는 '직계' 자손의 제목3만 적용됨
+	ul li.제목3 { ul 태그안쪽 li의 제목3만 적용됨
+	ul li.첫번째 + li { 첫번째 의 인접한 다음 li태그만 적용됨
+	ul li.아님 ~ li { 아님 밑의 모든 li 태그가 적용됨
+-->
+    <!-- 
+<style type="text/css">
+nav ul li:hover {
+	font-size: 30px;
+	font-weight: bold;
+	color: olive;
+}
+nav ul li:last-child {
+	font-size: 60px;
+	font-weight: bold;
+	color: olive;
+}
+</style>
+-->
+    <link href="../css/style2.css" type="text/css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <header id="헤더">
+      <div style="position:relative;">
+        <!-- header start -->
+        <h1 class="아무튼제목"><a id="logo" href="">뉴렉처 오프라인</a></h1>
+
+        <section>
+          <h1 id="header1" class="d-none">헤드리스</h1>
+
+          <nav id="main-menu">
+            <h1 class="d-none">메인메뉴였던것</h1>
+            <ul>
+              <li>
+                <a lang="en-us en-gb en-au en-nz" href="aa.html">킹습가이드</a>
+              </li>
+              <li><a lang="ko-aa">과정선택</a></li>
+              <li><a lang="bb">AnswerIs</a></li>
+            </ul>
+          </nav>
+
+          
+
+          <section>
+            <h1 id="search-form" class="제목3">강좌검색 폼</h1>
+            <form>과정검색</form>
+          </section>
+
+          <nav id="member-menu">
+            <h1 class="제목3 d-none">회원메뉴</h1>
+            <ul>
+              <li class="아님">
+                <a href="http://www.naver.com/aa.html#title">GOHOME</a>
+              </li>
+              <li><a id="asdf" href="http://www.naver.com/aa.html">로그인</a></li>
+              <li><a href="http://www.naver.com/aa.html">회원가입</a></li>
+            </ul>
+          </nav>
+
+          <nav>
+            <h1 class="제목3 d-none">자주사용하는메뉴</h1>
+            <ul  id="favorite-menu">
+              <li><a href="">유어페이지</a></li>
+              <li><a href="">직원센터</a></li>
+            </ul>
+          </nav>
+        </section>
+        <!-- header end -->
+      </div>
+    </header>
+    
+    <div id="비쥬얼">
+      <div>
+         
+      </div>
+    </div>
+    
+    <!-- body start -->
+    <div id="바디">
+      <div>
+        <!-- side menu start -->
+        <aside id="어사이드">
+          <h1>직원센터</h1>
+          <nav>
+            <h1>직원센터메뉴</h1>
+            <ul>
+              <li><a href="">공지사항</a></li>
+              <li><a href="">가끔있는 질문</a></li>
+              <li><a href="">문의는 안받습니다</a></li>
+              <li><a href="">이벤트 기획자가 없습니다</a></li>
+            </ul>
+          </nav>
+          <nav>
+            <h1>차단사이트</h1>
+            <ul>
+              <li>
+                <a href=""
+                  ><img alt="노트펍스(이미지)" src="../images/notepubs.png"
+                /></a>
+              </li>
+              <li>
+                <a href=""
+                  ><img alt="나무랩연구소(이미지)" src="../images/namoolab.png"
+                /></a>
+              </li>
+              <li>
+                <a href=""
+                  ><img alt="한빛미디어(이미지)" src="../images/hanbit.png"
+                /></a>
+              </li>
+            </ul>
+          </nav>
+        </aside>
+        <!-- side menu end -->
+        <!-- main start -->
+        <main>
+          <section>
+            <h1>공지없음</h1>
+            <nav>
+              <h1>중앙센터카테고리</h1>
+              <ol>
+                <li><a href="">집</a></li>
+                <li><a href="">중앙센터</a></li>
+                <li><a href="">공지없음</a></li>
+              </ol>
+            </nav>
+            <h2>공지없음 프린트</h2>
+            <table border="1">
+              <thead>
+                <tr>
+                  <td>Room번호</td>
+                  <td>타이틀이름</td>
+                  <td>사람</td>
+                  <td>시간</td>
+                  <td>관람객</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>10</th>
+                  <td><a href="">오라클 수업용 테이블 생성용 스크립트</a></td>
+                  <td>newlec</td>
+                  <td>2019-10-04</td>
+                  <td>109</td>
+                </tr>
+              </tbody>
+              <tbody>
+                <tr>
+                  <th>9</th>
+                  <td><a href="">JSP >수업용 html 파일</a></td>
+                  <td>newlec</td>
+                  <td>2019-10-03</td>
+                  <td>77</td>
+                </tr>
+              </tbody>
+            </table>
+            <div><span>5</span> / 1 numbers</div>
+            <div>
+              <a href=""
+                ><img alt="이전(이미지)" src="../images/btnNext.png"
+              /></a>
+            </div>
+            <nav>
+              <h1>공지없음 넘버</h1>
+              <ul>
+                <li><a href="">2</a></li>
+                <li><a href="">3</a></li>
+                <li><a href="">5</a></li>
+                <li><a href="">7</a></li>
+                <li><a href="">11</a></li>
+              </ul>
+            </nav>
+            <div>
+              <a href=""
+                ><img alt="다음(이미지)" src="../images/btnPrev.png"
+              /></a>
+            </div>
+          </section>
+        </main>
+        <!-- main end -->
+      </div>
+    </div>
+    <!-- body end -->
+    <!-- footer start -->
+    <footer id="푸터">
+      <!-- <section>
+        <h1>소유자 정보 (footer)</h1>
+        <section>
+          <h1>회사정보</h1>
+          <dl>
+            <dt>주소:</dt>
+            <dd>서울특별시 마포구 토정로35길 11, 인우빌딩 5층 266호</dd>
+            <dt>관리자메일:</dt>
+            <dd>admin@newlecture.com</dd>
+            <dt>사업자 등록번호:</dt>
+            <dd>132-18-46763</dd>
+            <dt>통신 판매업:</dt>
+            <dd>신고제 2013-서울강동-0969 호</dd>
+            <dt>상호:</dt>
+            <dd>뉴렉처</dd>
+            <dt>대표:</dt>
+            <dd>박용우</dd>
+            <dt>전화번호:</dt>
+            <dd>070-4206-4084</dd>
+          </dl>
+        </section>
+        <section>
+          <h1>저작권 정보</h1>
+        </section>
+        Copyright ⓒ newlecture.com 2012-2014 All Right Reserved. Contact
+        admin@newlecture.com for more information
+      </section> -->
+    </footer>
+    <!-- footer end -->
+  </body>
+</html>

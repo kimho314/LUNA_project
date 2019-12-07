@@ -1,0 +1,122 @@
+@import url(layout2.css);
+
+.d-none{
+    display: none;
+}
+
+/* ???? ???? ??? ??? ? */
+
+body{
+    list-style: decimal;
+
+    font-family: "??", Arial, Helvetica, sans-serif;
+    font-size:11px;
+    color:#979797;
+}
+
+/* ------------------- header ------------------ */
+
+#?? > div {
+    position:relative;
+}
+
+#logo {
+    display: inline-block;
+    width:182px;
+    height: 35px;
+    background: url(../images/logo.png) no-repeat left top;        
+    text-indent:-999px;
+    overflow:hidden;
+
+    position: absolute;
+    left:0;
+    top:23px;
+}
+
+#main-menu {
+    display: inline-block;
+    /* border:1px solid red; */
+    position: absolute;
+    left:200px;
+    top:27px;
+}
+
+#main-menu > ul{
+    display: flex;
+
+    font-family: "??", Arial, Helvetica, sans-serif;
+    font-size:15px;
+    font-weight: bold;
+    color:black
+}
+
+#main-menu > ul li {
+    list-style: none;
+    padding-left:24px;
+    background: url(../images/bg-main-menu-vsp.png) no-repeat 12px center;
+}
+
+#main-menu > ul > li:first-child {
+    padding-left : 0px;
+    background: none;
+}
+
+#main-menu > ul li a:hover {
+   color:#ff6a00;
+}
+
+#member-menu {
+    display: inline-block;
+    float: right;
+    position: absolute;
+    right:5px;
+    top:20px;
+}
+
+#member-menu > ul {
+    display: flex;
+
+    font-family: "??", Arial, Helvetica, sans-serif;
+    font-size:10px;
+    font-weight: bold;
+    color:#979797
+}
+
+#member-menu > ul li {
+    list-style: none;
+    padding-left:9px;
+    background: url(../images/bg-member-menu-sp.png) no-repeat 5px center;
+       
+}
+
+#member-menu > ul > li:first-child {
+    padding-left : 0px;
+    background: none;
+}
+
+/* ???? ???? */
+#favorite-menu li:nth-child(1) {
+    display: inline-block;
+    width:72px;
+    height: 17px;
+    background: url(../images/txt-mypage.png) no-repeat left top;        
+    text-indent:-999px;
+    overflow:hidden;
+
+    position: absolute;
+    right:72px;
+    top:40px;
+}
+
+#favorite-menu li:nth-child(2) {
+    display: inline-block;
+    width:72px;
+    height: 17px;
+    background: url(../images/txt-customer.png) no-repeat left top;        
+    text-indent:-999px;
+    overflow:hidden;
+
+    position: absolute;
+    right:0px;
+    top:40px;
+}
