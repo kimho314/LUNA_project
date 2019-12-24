@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns="http://www.springframework.org/schema/security"	
+	xmlns:context="http://www.springframework.org/schema/context"	
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+    	http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security.xsd">
+	
+	<http>
+		<intercept-url pattern="/admin/board/notice/reg" access="hasRole('ROLE_ADMIN')"/>
+	
+		<form-login login-page="/member/login" login-processing-url="/member/login" default-target-url="/index"/>
+		
+		<logout logout-url="/logout" logout-success-url="/index"/>
+		
+		<csrf disabled="true"/>
+	</http>
+	
+	<authentication-manager>
+		<authentication-provider>
+			<password-encoder hash="bcrypt"/>
+			<!-- <user-service>
+				<user name="newlec" password="{noop}111" authorities="ROLE_ADMIN,ROLD_TEACHER,ROLE_STUDENT"/>
+				<user name="dragon" password="{noop}111" authorities="ROLE_STUDENT"/>
+			</user-service> -->
+			<jdbc-user-service data-source-ref="dataSource" 
+			users-by-username-query="SELECT id, pwd password, 1 disabled FROM MEMBER WHERE id=?"
+			authorities-by-username-query="SELECT MEMBER_ID id, ROLE_ID roleId FROM MEMBER_ROLE WHERE MEMBER_ID=?"/>
+		</authentication-provider>
+	</authentication-manager>	
+</beans:beans>
